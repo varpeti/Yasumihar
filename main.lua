@@ -28,11 +28,17 @@ function love.load()
 	
 	kiir:init()
 	
-	player = env:ujObj(0,-100,{-10,-10,10,-10,10,10,-10,10})
+	player = env:ujObj({-10,-10,10,-10,10,10,-10,10})
 
-	env.world:getBodyList()[1]:setAngularVelocity(3)
+	env:getObj(player):getBody():setAngularVelocity(3)
 	
-	env:ujObj(0,100,{-20,-10,10,-10,10,10,-10,10},true)
+	env:ujObj({-50,-50,-30,-50,-40,-40})
+
+	env:ujObj({100,100,50,70,80,10,35,67,23,10})
+
+	--env:getObj(2):getBody():setAngularVelocity(1)
+
+	love.mouse.setPosition(Aksz,Akm)
 
 end
 
@@ -58,8 +64,6 @@ function love.draw()
 	
 	local mx,my = kamera:worldCoords(love.mouse:getX()-Aksz,love.mouse:getY()-Akm)
 	love.graphics.rectangle("fill",mx-10,my-10,20,20)
-	
-	--love.graphics.rectangle("fill",kornyezet[player].body:getX()-10,kornyezet[player].body:getY()-10,20,20)
 	
 	kamera:unset()
 	

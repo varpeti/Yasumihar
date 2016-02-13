@@ -44,23 +44,35 @@ env.IDs = 0 -- számláló
 
 local function createshape(x,y,coords)
 	for i=1,#coords,2 do
-		coords[i]=coords[i]+x
-		coords[i+1]=coords[i+1]+y
+		coords[i]=coords[i]-x
+		coords[i+1]=coords[i+1]-y
 	end
 	return love.physics.newPolygonShape(unpack(coords))
 end
 
+local function CoM(coords)
+	local maxx = 0
+	local maxy = 0
+	local i = 1
+	while i<=#coords do
+		maxx=maxx+coords[i]
+		maxy=maxy+coords[i+1]
+		i=i+2
+	end
+	local o = #coords/2
+	return maxx/o, maxy/o -- A tömeg középpont
+end
+
 --Global
 
-function env:ujObj(x,y,coords,gpl,szin1,szin2)
-	local body = love.physics.newBody(self.world, x, y, "dynamic") -- test
-	local shape
-	if gpl then 
-		shape = createshape(x,y,coords)-- shape: a coords (0;0) pontja az x,y-on van
-	else
-		shape = love.physics.newPolygonShape(unpack(coords)) --shape
-	end
+--set
 
+function env:ujObj(coords,szin1,szin2)
+
+	local x,y = CoM(coords)
+
+	local body = love.physics.newBody(self.world, x, y, "dynamic") -- test
+	local shape = createshape(x,y,coords)-- shape: a coords (0;0) pontja az x,y-on van
 	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
 
 	local DATA = {}
@@ -90,6 +102,23 @@ function env:ujObj(x,y,coords,gpl,szin1,szin2)
 	return DATA.ID
 end
 
+function env:addObj(ID,coords,szin1,szin2)
+	
+end
+
+--get
+
+function env:getObj(ID)
+	for b,body in ipairs(env.world:getBodyList()) do
+		for f,fixture in ipairs(body:getFixtureList()) do
+			if ID == fixture:getUserData().ID then return fixture end
+		end
+	end
+	return nil
+end
+
+-- draw, update
+
 function env:draw()
 	for b,body in ipairs(env.world:getBodyList()) do
 		for f,fixture in ipairs(body:getFixtureList()) do
@@ -117,21 +146,15 @@ function env:draw()
 				love.graphics.setColor(0,0,0,255)
 				love.graphics.line(body:getWorldPoint(shape:getPoint()))
 			end
+			love.graphics.setColor(255,255,255,255)
+			local x,y = body:getPosition()
+			love.graphics.circle("fill",x,y,5,15)
 		end
 	end		
 end
 
 function env:update(dt)
 	self.world:update(dt)
-end
-
-function env:getObj(id)
-	for b,body in ipairs(env.world:getBodyList()) do
-		for f,fixture in ipairs(body:getFixtureList()) do
-			if id == fixture:getUserData().ID then return fixture end
-		end
-	end
-	return nil
 end
 
 return env
