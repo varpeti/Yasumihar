@@ -1,4 +1,4 @@
-require('kamera')
+kamera = require('kamera')
 require('player')
 require('kiir')
 require('kornyezet')
@@ -11,18 +11,18 @@ function love.load()
   Asz=love.graphics.getWidth()
   Am=love.graphics.getHeight()
   Aksz=Asz/2 Akm=Am/2
-  love.window.setTitle("Ajnin - Created by Vp")
+  love.window.setTitle("Yasumihar - Váraljai Péter")
   love.window.setIcon(love.image.newImageData("Data/icon.png"))
 
   --fizikai beállítások
   love.physics.setMeter(10) --10 pixel = 1 méter
-  world = love.physics.newWorld(0, 9.81*10*0, true) --vízszintes:0  függőleges: 9.81 
+  world = love.physics.newWorld(0, 0, true) --vízszintes:0  függőleges: 0
 
   --Ütközés lekérdezés
   world:setCallbacks(beginContact, endContact, preSolve, postSolve)
 
   --Mobilos változók
-  isandroid= love.system.getOS()=="Android"
+  isandroid=true--love.system.getOS()=="Android"
   tx1, tx2, ty1, ty2 = 0,0,0,0
   t12x = -1
   t12y = -1
@@ -55,15 +55,18 @@ function love.update(dt)
 end
 
 function love.draw()
-  --px = kornyezet[player].body:getX()
-  --py = kornyezet[player].body:getY()
 
-  kamera:setPosition(px-Aksz*kamera.sx,py-Akm*kamera.sy) --kamera beállítása: player közepe - képernyő méret fele * nagyitás
+  kamera:MoveTo(px,py) --kamera beállítása: player közepe - képernyő méret fele * nagyitás
+  kamera:setRotationTo(pr)
   kamera:set()
 
   for i,elem in ipairs(kornyezet) do
     elem:draw()
   end
+
+  --love.graphics.rectangle("fill",-10,-10,20,20)
+
+  --love.graphics.rectangle("fill",kornyezet[player].body:getX()-10,kornyezet[player].body:getY()-10,20,20)
 
   kamera:unset()
 
@@ -104,19 +107,18 @@ function postSolve(a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, 
 end
 
 function love.wheelmoved( x, y )
-  if y>0 then kamera:setScale(kamera.sx-kamera.sx*0.1,kamera.sy-kamera.sy*0.1) end
-  if y<0 then kamera:setScale(kamera.sx+kamera.sx*0.1,kamera.sy+kamera.sy*0.1) end
-  spawnkiiras(kamera.sx.." nagyitas "..kamera.sy,1)
+  if y>0 then kamera:setScale(-0.1,-0.1) end
+  if y<0 then kamera:setScale(0.1,0.1) end
 end
 
---Input eventek (a gépes inputok a player.lua-ba vannak)
+--Input eventek (további a gépes inputok a player.lua-ba vannak)
 
 function love.keypressed(key)
    if key == "escape" then
       love.event.quit()
    end
   if key == "menu" or key=="space" then
-    if kameralock then kameralock=false else kameralock=true end
+    if kameralock then kameralock=false pr=0 else kameralock=true end
   end
 end
 
@@ -137,8 +139,8 @@ function love.touchmoved(i,x,y)
 
   if t12x~=-1 then
     if ( (math.abs(tx1-tx2)<t12x) or (math.abs(ty1-ty2)<t12y) ) and t12x~=0 and t12y~=0
-      then kamera:setScale(kamera.sx-kamera.sx*0.01,kamera.sy-kamera.sy*0.01) spawnkiiras("n",10)
-      else kamera:setScale(kamera.sx+kamera.sx*0.01,kamera.sy+kamera.sy*0.01) spawnkiiras("k",10)
+      then kamera:setScale(-0.01,-0.01)
+      else kamera:setScale(0.01,0.01)
     end
     t12x=math.abs(tx1-tx2)
     t12y=math.abs(ty1-ty2)
@@ -161,10 +163,10 @@ end
 function goFullscreen()
   local maxRes = getMaxResolution()
   love.window.setMode(
-    maxRes.width,
-    maxRes.height,
+    1280,--maxRes.width,
+    1024,--maxRes.height,
     {
-      fullscreen = true,
+      --fullscreen = true,
       vsync = true
     }
   )
