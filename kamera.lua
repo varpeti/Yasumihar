@@ -35,7 +35,7 @@ function kamera:gPos() --get
     return self.x, self.y
 end
 
--- zoom
+-- Zoom
 
 function kamera:rScale(sx,sy) --relat
 	self.sx = self.sx+self.sx*sx
@@ -63,6 +63,22 @@ end
 
 function kamera:gRot() --get
     return self.r
+end
+
+-- coordsystems
+
+function kamera:camCoords(x,y)
+  local c,s = math.cos(-self.r), math.sin(-self.r)
+  local x,y = x - self.kx, y - self.ky
+  x,y = c*x - s*y, s*x + c*y
+  return x*self.sx, y*self.sy
+end
+
+function kamera:worldCoords(x,y)
+  local c,s = math.cos(self.r), math.sin(self.r)
+  local x,y = x*self.sx, y*self.sy
+  x,y = c*x - s*y, s*x + c*y
+  return x+self.kx, y+self.ky
 end
 
 return kamera

@@ -56,7 +56,8 @@ function love.draw()
 	
 	env:draw()
 	
-	--love.graphics.rectangle("fill",-10,-10,20,20)
+	local mx,my = kamera:worldCoords(love.mouse:getX()-Aksz,love.mouse:getY()-Akm)
+	love.graphics.rectangle("fill",mx-10,my-10,20,20)
 	
 	--love.graphics.rectangle("fill",kornyezet[player].body:getX()-10,kornyezet[player].body:getY()-10,20,20)
 	
