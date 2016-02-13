@@ -13,15 +13,12 @@ function player_init()
 	player=#kornyezet
 	--]]
 
-	facreate(0,0)
-	player=1
+	--facreate(0,0)
 
 	speed = 1000
 	px = 0
 	py = 0
 	pr = 0
-
-	kornyezet[player].body:applyAngularImpulse(5e4)
 end
 
 function player_update(dt)
@@ -29,27 +26,23 @@ function player_update(dt)
 	speed = 1000/kamera:gScale()
 
 	if love.keyboard.isDown("d") or (love.mouse.getX()>=Asz*0.95 and not isandroid) then
-		--kornyezet[player].body:applyLinearImpulse(dt*speed,0,px,py)
 		px=px+dt*speed
 	end
 	if love.keyboard.isDown("a") or (love.mouse.getX()<=Asz*0.05 and not isandroid) then
-		--kornyezet[player].body:applyLinearImpulse(-1*dt*speed,0,px,py)
 		px=px-dt*speed
 	end
 	if love.keyboard.isDown("s") or (love.mouse.getY()>=Am*0.95 and not isandroid) then
-	   	--kornyezet[player].body:applyLinearImpulse(0,dt*speed,px,py)
 	   	py=py+dt*speed
 	end
 	if love.keyboard.isDown("w") or (love.mouse.getY()<=Am*0.05 and not isandroid) then
-	   	--kornyezet[player].body:applyLinearImpulse(0,-1*dt*speed,px,py)
 	   	py=py-dt*speed
 	end
 	if love.keyboard.isDown("r")  then
     	pr=pr-0.01
   	end
 	if kameralock then
-		px = kornyezet[player].body:getX()
-    	py = kornyezet[player].body:getY()
-    	pr = kornyezet[player].body:getAngle()
+		local body = env:getObj(player):getBody()
+		px,py = body:getPosition()
+		pr = body:getAngle()
     end
 end

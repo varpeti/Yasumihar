@@ -1,218 +1,137 @@
 --local ser = require('ser')
 local env = {}
-env.IDs=0
 
---fizikai beállítások
 love.physics.setMeter(10) --10 pixel = 1 méter
-env.world = love.physics.newWorld(0, 0, true) --vízszintes:0  függőleges: 0
 
-world:setCallbacks(beginContact, endContact, preSolve, postSolve) --Ütközés lekérdezés
+env.world = love.physics.newWorld(0, 0, true) -- világ létrehozása 0, 0 gravitációval
+env.IDs = 0 -- számláló
 
-env.objs = {}
+--env.world:setCallbacks(beginContact, endContact, preSolve, postSolve) --Ütközés lekérdezés
 
 --[[
-	(L) list | (T) table | ( ) number | (E) other
-	env L
-		IDs
-		meter
-		world
-		objs L
-			obj T
-				ID
-				apos T
-					x
-					y
-				angle
-				rpos T
-					rx
-					ry
-					objID
-				img T
-				szin T
-					rr
-					gg
-					bb
-					aa
-				szin2 T
-					rr
-					gg
-					bb
-					aa
-				body E
-				shfik L
-					shfi T
-						shape E
-						fixture E
-				type (nil: not phy,"static": static,"dynamic": dynamic)
-				userdata T
+	DATA T
+		ID 
+		szin1 T
+			rr
+			gg
+			bb
+		szin2 T
+			rr
+			gg
+			bb
+		img
+		rpos
+			ID
+			x
+			y
+		stat T
+			HP
+			Armor
+				rr
+				gg
+				bb
+			Energia
+		dot T
+			dmg
+				rr
+				gg
+				bb
+			time
+			x
 ]]
 
-local largeenough
+--Local
 
-function env:newObj(coords,x,y,type,angle)
-	if (#coords/2 < 3) or (#coords/2 > 8) then return -1 end -- három - nyolc szög kell h legyen
-	if not largeenough(coords) then return -2 end -- elég nagy e?
-
-	local obj = {}
-
-	self.IDs=self.IDs+1 -- az ID számlálót növelem
-	obj.ID=self.IDs -- ID adás
-
-	obj.rpos = {} -- relatív (másik objektumtól tartott pozíció)
-	obj.rx = 0
-	obj.ry = 0
-	obj.objID = -1
-
-	obj.img = nil
-
-	obj.szin = {}
-	obj.szin.rr = 0
-	obj.szin.gg = 0
-	obj.szin.bb = 0
-	obj.szin.aa = 255
-
-	obj.szin2 = {}
-	obj.szin2.rr = 255
-	obj.szin2.gg = 255
-	obj.szin2.bb = 255
-	obj.szin2.aa = 255
-
-	obj.type = type
-
-	shfik = {}
-		shif = {}
-		shif.shape = love.physics.newPolygonShape(unpack(coords))
-
-
-		if obj.type~=nil 
-		then --Fizikai
-			if obj.type=="static"
-				then obj.body = love.physics.newBody(self.world, x, y, "static")
-				else obj.body = love.physics.newBody(self.world, x, y, "dynamic")
-			end
-			obj.body:setUserData(obj.ID) -- UserDatába mentem az ID-jét
-			shif.fixture = love.physics.newFixture(obj.body,shif.shape)
-			obj.apos = {} -- pozíció (body.getPosition)
-			obj.apos.x = obj.body:getX
-			obj.apos.y = obj.body:getY
-			obj.angle = obj.body:getAngle
-		else -- Nem fizikai
-			obj.body = nil
-			shif.fixture = nil
-			obj.apos = {} -- pozíció
-			obj.apos.x = x
-			obj.apos.y = y
-			obj.angle = (angle or 0) 
-		end
-	table.insert(shfik,shif)
-
-	obj.userdata = nil
-
-	table.insert(objs,obj)
-	return obj.ID
+local function createshape(x,y,coords)
+	for i=1,#coords,2 do
+		coords[i]=coords[i]+x
+		coords[i+1]=coords[i+1]+y
+	end
+	return love.physics.newPolygonShape(unpack(coords))
 end
 
--- Local
+--Global
 
-largeenough = function (coords) --checks if a polygon is good enough for box2d's snobby standards.
-	--Written by Adam/earthHunter
-
-	-- Calculation of centroids of each triangle
-
-	local centroids = {}
-
-	local anchorX = coords[1]
-	local anchorY = coords[2]
-
-	local firstX = coords[3]
-	local firstY = coords[4]
-
-	for i = 5, #coords - 1, 2 do
-
-		local x = coords[i]
-		local y = coords[i + 1]
-
-		local centroidX = (anchorX + firstX + x) / 3
-		local centroidY = (anchorY + firstY + y) / 3
-
-		local area = math.abs(anchorX * firstY + firstX * y + x * anchorY
-				- anchorX * y - firstX * anchorY - x * firstY) / 2
-
-		local index = 3 * (i - 3) / 2 - 2
-
-		centroids[index] = area
-		centroids[index + 1] = centroidX * area
-		centroids[index + 2] = centroidY * area
-
-		firstX = x
-		firstY = y
-
+function env:ujObj(x,y,coords,gpl,szin1,szin2)
+	local body = love.physics.newBody(self.world, x, y, "dynamic") -- test
+	local shape
+	if gpl then 
+		shape = createshape(x,y,coords)-- shape: a coords (0;0) pontja az x,y-on van
+	else
+		shape = love.physics.newPolygonShape(unpack(coords)) --shape
 	end
 
-	-- Calculation of polygon's centroid
+	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
 
-	local totalArea = 0
-	local centroidX = 0
-	local centroidY = 0
-
-	for i = 1, #centroids - 2, 3 do
-
-		totalArea = totalArea + centroids[i]
-		centroidX = centroidX + centroids[i + 1]
-		centroidY = centroidY + centroids[i + 2]
-
-	end
-
-	centroidX = centroidX / totalArea
-	centroidY = centroidY / totalArea
-
-	-- Calculation of normals
-
-	local normals = {}
-
-	for i = 1, #coords - 1, 2 do
-
-		local i2 = i + 2
-
-		if (i2 > #coords) then
-
-			i2 = 1
-
+	local DATA = {}
+		self.IDs = self.IDs+1 -- növelem a számlálót
+		DATA.ID = self.IDs
+		DATA.szin1 = {}
+		if szin1 ~= nil then
+			DATA.szin1.rr = szin1.rr
+			DATA.szin1.gg = szin1.gg
+			DATA.szin1.bb = szin1.bb
+		else
+			DATA.szin1.rr = math.random(122,255)
+			DATA.szin1.gg = math.random(122,255)
+			DATA.szin1.bb = math.random(122,255)
 		end
-
-		local tangentX = coords[i2] - coords[i]
-		local tangentY = coords[i2 + 1] - coords[i + 1]
-		local tangentLen = math.sqrt(tangentX * tangentX + tangentY * tangentY)
-
-		tangentX = tangentX / tangentLen
-		tangentY = tangentY / tangentLen
-
-		normals[i] = tangentY
-		normals[i + 1] = -tangentX
-
-	end
-
-	-- Projection of vertices in the normal directions
-	-- in order to obtain the distance from the centroid
-	-- to each side
-
-	-- If a side is too close, the polygon will crash the game
-
-	for i = 1, #coords - 1, 2 do
-
-		local projection = (coords[i] - centroidX) * normals[i]
-				+ (coords[i + 1] - centroidY) * normals[i + 1]
-
-		if (math.abs(projection) < 0.04*10) then -- *10 -> meter Vp
-			
-			return false
-
+		DATA.szin2 = {}
+		if szin2 ~= nil then
+			DATA.szin2.rr = szin2.rr
+			DATA.szin2.gg = szin2.gg
+			DATA.szin2.bb = szin2.bb
+		else
+			DATA.szin2.rr = math.random(122,255)
+			DATA.szin2.gg = math.random(122,255)
+			DATA.szin2.bb = math.random(122,255)
 		end
+	fixture:setUserData(DATA)
+	return DATA.ID
+end
 
+function env:draw()
+	for b,body in ipairs(env.world:getBodyList()) do
+		for f,fixture in ipairs(body:getFixtureList()) do
+			local shape = fixture:getShape()
+			local shapeType = shape:getType()
+			local DATA = fixture:getUserData()
+	
+			if (shapeType == "circle") then
+				local x,y = body:getWorldPoint(shape:getPoint())
+				local radius = shape:getRadius()
+				love.graphics.setColor(DATA.szin1.rr,DATA.szin1.gg,DATA.szin1.bb,255)
+				love.graphics.circle("fill",x,y,radius,15)
+				love.graphics.setColor(DATA.szin2.rr,DATA.szin2.gg,DATA.szin2.bb,255)
+				love.graphics.circle("line",x,y,radius,15)
+			elseif (shapeType == "polygon") then
+				local points = {body:getWorldPoints(shape:getPoints())}
+				love.graphics.setColor(DATA.szin1.rr,DATA.szin1.gg,DATA.szin1.bb,255)
+				love.graphics.polygon("fill",points)
+				love.graphics.setColor(DATA.szin2.rr,DATA.szin2.gg,DATA.szin2.bb,255)
+				love.graphics.polygon("line",points)
+			elseif (shapeType == "edge") then
+				love.graphics.setColor(0,0,0,255)
+				love.graphics.line(body:getWorldPoint(shape:getPoint()))
+			elseif (shapeType == "chain") then
+				love.graphics.setColor(0,0,0,255)
+				love.graphics.line(body:getWorldPoint(shape:getPoint()))
+			end
+		end
+	end		
+end
+
+function env:update(dt)
+	self.world:update(dt)
+end
+
+function env:getObj(id)
+	for b,body in ipairs(env.world:getBodyList()) do
+		for f,fixture in ipairs(body:getFixtureList()) do
+			if id == fixture:getUserData().ID then return fixture end
+		end
 	end
-
-	return true
-
+	return nil
 end
 
 return env
