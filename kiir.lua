@@ -28,5 +28,5 @@ function kiir:draw(i)
 end
 
 function spawnkiiras(mit,ido)
-	table.insert(kiirasok,kiir.create(mit,ido))
+	table.insert(kiirasok,kiir.create(mit,(ido or 3)))
 end

@@ -89,8 +89,8 @@ function beginContact(a, b, coll)
   if a:getBody() == kornyezet[player].body or b:getBody() == kornyezet[player].body then
     local x1, y1, x2, y2 = coll:getPositions()
     if px~=nil then
-      spawnkiiras(px-x1.." x",30)
-      spawnkiiras(py-y1.." y",30)
+      spawnkiiras(px-x1.." x")
+      spawnkiiras(py-y1.." y",3)
     end
   end
 end
