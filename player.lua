@@ -1,4 +1,5 @@
 function player_init()
+	--[[
 	local p, sz = 4, 0
 	local a, b = 100, 100
 	local coords = {}
@@ -10,8 +11,9 @@ function player_init()
 	rr,gg,bb,aa =  000, 255, 255, 122 --math.random(0,255),math.random(0,255),math.random(0,255),math.random(0,255)
 	elem:uj(coords,true,rr,gg,bb,aa,0)
 	player=#kornyezet
+	--]]
 
-	--facreate(0,0)
+	facreate(0,0)
 	player=1
 
 	speed = 1000
@@ -24,7 +26,7 @@ end
 
 function player_update(dt)
 
-	speed = 1000
+	speed = 1000/kamera:gScale()
 
 	if love.keyboard.isDown("d") or (love.mouse.getX()>=Asz*0.95 and not isandroid) then
 		--kornyezet[player].body:applyLinearImpulse(dt*speed,0,px,py)

@@ -56,8 +56,8 @@ end
 
 function love.draw()
 
-  kamera:MoveTo(px,py) --kamera beállítása: player közepe - képernyő méret fele * nagyitás
-  kamera:setRotationTo(pr)
+  kamera:aPos(px,py) --kamera beállítása: player közepe - képernyő méret fele * nagyitás
+  kamera:aRot(pr)
   kamera:set()
 
   for i,elem in ipairs(kornyezet) do
@@ -107,8 +107,8 @@ function postSolve(a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, 
 end
 
 function love.wheelmoved( x, y )
-  if y>0 then kamera:setScale(-0.1,-0.1) end
-  if y<0 then kamera:setScale(0.1,0.1) end
+  if y>0 then kamera:rScale(-0.1) end
+  if y<0 then kamera:rScale(0.1) end
 end
 
 --Input eventek (további a gépes inputok a player.lua-ba vannak)
@@ -139,8 +139,8 @@ function love.touchmoved(i,x,y)
 
   if t12x~=-1 then
     if ( (math.abs(tx1-tx2)<t12x) or (math.abs(ty1-ty2)<t12y) ) and t12x~=0 and t12y~=0
-      then kamera:setScale(-0.01,-0.01)
-      else kamera:setScale(0.01,0.01)
+      then kamera:rScale(-0.01)
+      else kamera:rScale(0.01)
     end
     t12x=math.abs(tx1-tx2)
     t12y=math.abs(ty1-ty2)
