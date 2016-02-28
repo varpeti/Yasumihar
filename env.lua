@@ -63,21 +63,11 @@ local function CoM(coords)
 	return maxx/o, maxy/o -- A tömeg középpont
 end
 
---Global
-
---set
-
-function env:ujObj(coords,szin1,szin2)
-
-	local x,y = CoM(coords)
-
-	local body = love.physics.newBody(self.world, x, y, "dynamic") -- test
-	local shape = createshape(x,y,coords)-- shape: a coords (0;0) pontja az x,y-on van
-	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
+local function DatA(fixture,szin1,szin2)
 
 	local DATA = {}
-		self.IDs = self.IDs+1 -- növelem a számlálót
-		DATA.ID = self.IDs
+		env.IDs = env.IDs+1 -- növelem a számlálót
+		DATA.ID = env.IDs
 		DATA.szin1 = {}
 		if szin1 ~= nil then
 			DATA.szin1.rr = szin1.rr
@@ -102,8 +92,30 @@ function env:ujObj(coords,szin1,szin2)
 	return DATA.ID
 end
 
-function env:addObj(ID,coords,szin1,szin2)
+--Global
+
+--set
+
+function env:ujObj(coords,szin1,szin2)
+
+	local x,y = CoM(coords)
+
+	local body = love.physics.newBody(self.world, x, y, "dynamic") -- test
+	local shape = createshape(x,y,coords)-- shape: a coords (0;0) pontja az x,y-on van
+	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
+
+	return DatA(fixture,szin1,szin2)
 	
+end
+
+function env:addObj(ID,coords,szin1,szin2)
+
+	local x,y = CoM(coords)
+	local body = self:getObj(ID):getBody()
+	local shape = love.physics.newPolygonShape(unpack(coords)) 
+	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
+
+	return DatA(fixture,szin1,szin2)
 end
 
 --get
@@ -135,7 +147,7 @@ function env:draw()
 				love.graphics.circle("line",x,y,radius,15)
 			elseif (shapeType == "polygon") then
 				local points = {body:getWorldPoints(shape:getPoints())}
-				love.graphics.setColor(DATA.szin1.rr,DATA.szin1.gg,DATA.szin1.bb,255)
+				love.graphics.setColor(DATA.szin1.rr,DATA.szin1.gg,DATA.szin1.bb,122)
 				love.graphics.polygon("fill",points)
 				love.graphics.setColor(DATA.szin2.rr,DATA.szin2.gg,DATA.szin2.bb,255)
 				love.graphics.polygon("line",points)
@@ -146,9 +158,11 @@ function env:draw()
 				love.graphics.setColor(0,0,0,255)
 				love.graphics.line(body:getWorldPoint(shape:getPoint()))
 			end
-			love.graphics.setColor(255,255,255,255)
-			local x,y = body:getPosition()
-			love.graphics.circle("fill",x,y,5,15)
+			if DEBUG then
+				love.graphics.setColor(255,255,255,255)
+				local x,y = body:getPosition()
+				love.graphics.circle("fill",x,y,5,15)
+			end
 		end
 	end		
 end

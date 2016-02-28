@@ -1,9 +1,11 @@
 math.randomseed(os.time())
 
 kamera = require('kamera')
-require('player')
-require('kiir')
+player = require('player')
+kiir = require('kiir')
+require('debug')
 env = require('env')
+require('fa')
 
 
 function love.load()
@@ -24,21 +26,30 @@ function love.load()
 	--Sima változók
 	kameralock = false
 	
-	player_init()
+	player.id = facreate(0,0) --env:ujObj({-10,-10,10,-10,10,10,-10,10})
 	
-	kiir:init()
-	
-	player = env:ujObj({-10,-10,10,-10,10,10,-10,10})
+	--env:addObj(player.id,{-50,-50,-30,-50,-40,-40})
 
-	env:getObj(player):getBody():setAngularVelocity(3)
-	
-	env:ujObj({-50,-50,-30,-50,-40,-40})
+    env:getObj(player.id):getBody():setAngularVelocity(0.3)
 
-	env:ujObj({100,100,50,70,80,10,35,67,23,10})
+	--env:ujObj({200,200,150,170,180,110,135,167,123,110})
 
 	--env:getObj(2):getBody():setAngularVelocity(1)
 
 	love.mouse.setPosition(Aksz,Akm)
+
+	DEBUG = false
+
+	kiir:set(nil,nil,10,true,DEBUG,12)
+
+	kiir:new("Gombok:",30)
+	kiir:new("WASD, nyilak, egér - kamera mozgás",31)
+	kiir:new("SPACE - kameralock",32)
+	kiir:new("F8 - Debug",33)
+	kiir:new("Görgö - Zoom",34)
+	kiir:new("B - kiirteszt",35)
+	kiir:new("ESC - kilépés",36)
+
 
 end
 
@@ -46,18 +57,16 @@ function love.update(dt)
 
 	env:update(dt) --ez kell a fizikai világ frissítéshez
 	
-	player_update(dt)
+	player:update(dt)
 	
-	for i,kiir in ipairs(kiirasok) do
-		kiir:update(i,dt)
-	end
+	kiir:update(dt)
 
 end
 
 function love.draw()
 
-	kamera:aPos(px,py) --kamera beállítása: player közepe - képernyő méret fele * nagyitás
-	kamera:aRot(pr)
+	kamera:aPos(player.x,player.y) --kamera beállítása: player közepe - képernyő méret fele * nagyitás
+	kamera:aRot(player.r)
 	kamera:set()
 	
 	env:draw()
@@ -68,12 +77,10 @@ function love.draw()
 	kamera:unset()
 	
 	love.graphics.setColor(255,255,255,255)
-	--kiirasok
-	for i,kiir in ipairs(kiirasok) do
-		kiir:draw(i)
-	end
 	
-	love.graphics.print(px.."       "..py,10,10)
+	kiir:draw(10,Am-25,nil,DEBUG) --kiirasok
+
+	love.graphics.print(player.x.."       "..player.y,10,10)
 
 end
 
@@ -89,20 +96,25 @@ function love.keypressed(key)
 		love.event.quit()
 	end
 	if key == "menu" or key=="space" then
-	if kameralock then kameralock=false pr=0 else kameralock=true end
+		if kameralock then kameralock=false player.r=0 else kameralock=true end
+	end
+	if key == "f8" then
+		DEBUG = not DEBUG
+	end
+	if key == "b" then
+		kiir:new("Ido: "..os.time())
 	end
 end
 
 function love.touchpressed(i,x,y)
 	if i==0 then tx1=x ty1=y end
 	if i==1 then tx2=x ty2=y t12x=0 t12y=0 end
-	spawnkiiras(i,10)
 end
 
 function love.touchmoved(i,x,y)
 	if t12x==-1 then
-		px = px + (tx1-x)*speed
-		py = py + (ty1-y)*speed
+		player.x = player.x + (tx1-x)*player.speed
+		player.y = pplayer.y + (ty1-y)*player.speed
 	end
 
 	if i==0 then tx1=x ty1=y end

@@ -1,32 +1,76 @@
-kiir = {}
-kiir.__index = kiir
+local kiir = {}
+kiir.kiik = {}
+kiir.alap = {}
+kiir.aktiv = 0
 
-function kiir.create(mit,ido)
-	local self = {}
-	setmetatable(self,kiir)
-	self.mit=mit
-	self.ido=ido
-	return self
+-- létrehozás, törlés | new, del
+
+function kiir:new(szoveg,ido) -- string, time
+	if not szoveg then return nil end
+	ido = ido or kiir.alap.ido
+	table.insert(kiir.kiik,{szoveg=szoveg,ido=ido})
+	return #kiir
 end
 
-function kiir:init()
-	kiirasok = {}
-	spawnkiiras(love.mouse.getX().." "..love.mouse.getY(),90)
-	spawnkiiras(Aksz.." "..Akm,90)
+function kiir:del()
+	kiir.kiik={}
 end
 
-function kiir:update(i,dt)
-	if self.ido>0 then self.ido=self.ido-1*dt
-	else 
-      	table.remove(kiirasok,i)
-    end
+
+-- frissítés, kiírás | update, draw
+
+function kiir:update(dt)
+	kiir.aktiv=0
+	for id,kii in ipairs(kiir.kiik) do
+		if kii.ido>0 then 
+			kii.ido = kii.ido-dt
+			kiir.aktiv=kiir.aktiv+1
+		end
+		if kii.ido<0 then 
+			kii.ido = 0 
+			kiir.aktiv=kiir.aktiv-1
+		end
+	end
 end
 
-function kiir:draw(i)
-		love.graphics.print(self.mit,10,Am-Am/20-20*i)
-		--print(self.mit)
+function kiir:draw(x,y,felvagyle,osszes,helyköz) -- x,y,upordown,all,linespace
+	x = x or kiir.alap.x
+	y = y or kiir.alap.y
+	felvagyle = felvagyle or kiir.alap.felvagyle
+	osszes = osszes or kiir.alap.osszes
+	helyköz = helyköz or kiir.alap.helyköz
+
+	local pos
+	if osszes then 
+		pos = #kiir.kiik
+	else
+		pos = kiir.aktiv
+	end
+
+	for id,kii in ipairs(kiir.kiik) do
+		if osszes or kii.ido>0 then
+			if felvagyle 
+			then
+				love.graphics.print(kii.szoveg,x,y-(pos*helyköz))
+			else
+				love.graphics.print(kii.szoveg,x,y+(pos*helyköz))
+			end
+			pos=pos-1
+		end
+	end
 end
 
-function spawnkiiras(mit,ido)
-	table.insert(kiirasok,kiir.create(mit,(ido or 3)))
+-- beállítás | setting
+
+function kiir:set(x,y,ido,felvagyle,osszes,helyköz)
+	kiir.alap.x = x or 0
+	kiir.alap.y = y or 0
+	kiir.alap.ido = ido or 5 -- time (sec)
+	kiir.alap.felvagyle = felvagyle or false -- up or down (false=down)
+	kiir.alap.osszes = osszes or false -- all (false= only the actives)
+	kiir.alap.helyköz = helyköz or 12 -- line space (pixel)
 end
+
+kiir:set() -- alap beállítások
+
+return kiir
