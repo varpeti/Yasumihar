@@ -3,7 +3,6 @@ math.randomseed(os.time())
 kamera = require('kamera')
 player = require('player')
 kiir = require('kiir')
-require('debug')
 env = require('env')
 require('fa')
 
@@ -19,24 +18,29 @@ function love.load()
 	
 	--Mobilos változók
 	isandroid=love.system.getOS()=="Android"
-	tx1, tx2, ty1, ty2 = 0,0,0,0
-	t12x = -1
-	t12y = -1
 	
 	--Sima változók
 	kameralock = false
+	DEBUG = false
 
-	env:ujObj({-50,-50,-30,50,40,40})
+
+	env:setCallbacks()
+
+	env:newObj({-50,-50,-30,50,40,40})
+	env:addObj(1,{200,200,150,170,180,110,135,167,123,110})
+	env:getObj(1):getBody():setPosition(200,0)
+
+	env:newObj({-50,-50,-30,50,40,40})
+    env:newObj({200,200,150,170,180,110,135,167,123,110})
 	
-	player.id = facreate(-700,-700) --env:ujObj({-10,-10,10,-10,10,10,-10,10})
+	player.id = facreate(-700,-700) --env:newObj({-10,-10,10,-10,10,10,-10,10})
 
     env:getObj(player.id):getBody():setAngularVelocity(0.3)
 
-	env:getObj( env:ujObj({200,200,150,170,180,110,135,167,123,110}) ):getBody():setAngularVelocity(-1)
+	env:getObj(1):getBody():setAngularVelocity(-0.5)
 
 	love.mouse.setPosition(Aksz,Akm)
 
-	DEBUG = false
 
 	kiir:set(nil,nil,10,true,DEBUG,12)
 
@@ -48,7 +52,6 @@ function love.load()
 	kiir:new("B - kiirteszt",35)
 	kiir:new("R - kameraforgatás (kameralock esetében is!)",36)
 	kiir:new("ESC - kilépés",37)
-
 
 end
 
@@ -105,32 +108,11 @@ function love.keypressed(key)
 	end
 end
 
-function love.touchpressed(i,x,y)
-	if i==0 then tx1=x ty1=y end
-	if i==1 then tx2=x ty2=y t12x=0 t12y=0 end
-end
 
-function love.touchmoved(i,x,y)
-	if t12x==-1 then
-		player.x = player.x + (tx1-x)*player.speed
-		player.y = pplayer.y + (ty1-y)*player.speed
-	end
-
-	if i==0 then tx1=x ty1=y end
-	if i==1 then tx2=x ty2=y end
-
-	if t12x~=-1 then
-		if ( (math.abs(tx1-tx2)<t12x) or (math.abs(ty1-ty2)<t12y) ) and t12x~=0 and t12y~=0
-			then kamera:rScale(-0.01)
-			else kamera:rScale(0.01)
-		end
-		t12x=math.abs(tx1-tx2)
-		t12y=math.abs(ty1-ty2)
-	end
-end
-
-function love.touchreleased(i,x,y)
-	if i==1 then t12x=-1 t12y=-1 end
+function love.touchmoved(id, x, y, dx, dy)
+	--player.x = player.x+(x-dx)
+	--player.y = player.y+(y-dy)
+	kiir:new( (x-dx).."	"..(y-dy) )
 end
 
 

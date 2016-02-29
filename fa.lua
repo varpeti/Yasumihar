@@ -23,7 +23,7 @@ function facreate(x,y)
 			elseif f.l==1 then env:addObj(ID,coords,{rr=000,gg=000,bb=000},{rr=255,gg=255,bb=255})--{rr=255,gg=255,bb=255})
 			end
 		else
-			ID = env:ujObj(coords,{rr=255,gg=0,bb=0},{rr=255,gg=255,bb=255},true)--{rr=0,gg=0,bb=255})
+			ID = env:newObj(coords,{rr=255,gg=0,bb=0},{rr=255,gg=255,bb=255},true)--{rr=0,gg=0,bb=255})
 		end
 	end
 	while 1<=#fa do

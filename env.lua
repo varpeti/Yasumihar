@@ -6,8 +6,6 @@ love.physics.setMeter(10) --10 pixel = 1 méter
 env.world = love.physics.newWorld(0, 0, true) -- világ létrehozása 0, 0 gravitációval
 env.IDs = 0 -- számláló
 
-env.world:setCallbacks(beginContact, endContact, preSolve, postSolve) --Ütközés lekérdezés
-
 --[[
 	DATA T
 		ID 
@@ -40,7 +38,9 @@ env.world:setCallbacks(beginContact, endContact, preSolve, postSolve) --Ütköz�
 			x
 ]]
 
+--------
 --Local
+--------
 
 local function createshape(x,y,coords)
 	for i=1,#coords,2 do
@@ -92,11 +92,13 @@ local function DatA(fixture,szin1,szin2)
 	return DATA.ID
 end
 
+---------
 --Global
+---------
 
 --set
 
-function env:ujObj(coords,szin1,szin2)
+function env:newObj(coords,szin1,szin2)
 
 	local x,y = CoM(coords)
 
@@ -170,5 +172,32 @@ end
 function env:update(dt)
 	self.world:update(dt)
 end
+
+
+--Ütközések
+
+function beginContact(a, b, coll)
+ 	kiir:new("Ütközés: A: "..table.concat({a:getBody():getPosition()},"	").."		B: "..table.concat({b:getBody():getPosition()},"	"),10)
+end
+ 
+function endContact(a, b, coll)
+	
+end
+ 
+function preSolve(a, b, coll)
+	
+end
+ 
+function postSolve(a, b, coll, normalimpulse, tangentimpulse)
+	
+end
+
+function env:setCallbacks()
+	env.world:setCallbacks(beginContact, endContact, preSolve, postSolve) --Ütközés lekérdezés
+end
+
+--------
+--Vége--
+--------
 
 return env
