@@ -1,11 +1,11 @@
 fa = {}
 
 function facreate(x,y)
-	fraktal(0,0,90*(3.141592653589793238462643383279/180),20*(3.141592653589793238462643383279/180),8,math.random(-100.000,100.000),0)
+	fraktal(0,0,-90*(3.141592653589793238462643383279/180),20*(3.141592653589793238462643383279/180),8,math.random(-100.000,100.000),0)
 	local ID
 	for j,f in ipairs(fa) do
 		local coords = {}
- 		local a, b = x+f.x, y+f.y
+ 		local a, b = f.x, f.y
  		local sz = (3.141592653589793238462643383279/180) * (90+45)
  		local p = math.random(3,8)
  		for i=1,p*2,2 do 
@@ -23,12 +23,13 @@ function facreate(x,y)
 			elseif f.l==1 then env:addObj(ID,coords,{rr=000,gg=000,bb=000},{rr=255,gg=255,bb=255})--{rr=255,gg=255,bb=255})
 			end
 		else
-			ID = env:ujObj(coords,{rr=255,gg=0,bb=0},{rr=255,gg=255,bb=255})--{rr=0,gg=0,bb=255})
+			ID = env:ujObj(coords,{rr=255,gg=0,bb=0},{rr=255,gg=255,bb=255},true)--{rr=0,gg=0,bb=255})
 		end
 	end
 	while 1<=#fa do
 		table.remove(fa,1)
 	end
+	env:getObj(ID):getBody():setPosition(x,y)
 	return ID
 end
 

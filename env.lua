@@ -6,7 +6,7 @@ love.physics.setMeter(10) --10 pixel = 1 méter
 env.world = love.physics.newWorld(0, 0, true) -- világ létrehozása 0, 0 gravitációval
 env.IDs = 0 -- számláló
 
---env.world:setCallbacks(beginContact, endContact, preSolve, postSolve) --Ütközés lekérdezés
+env.world:setCallbacks(beginContact, endContact, preSolve, postSolve) --Ütközés lekérdezés
 
 --[[
 	DATA T

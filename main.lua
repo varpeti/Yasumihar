@@ -18,23 +18,21 @@ function love.load()
 	love.window.setIcon(love.image.newImageData("Data/icon.png"))
 	
 	--Mobilos változók
-	isandroid=true--love.system.getOS()=="Android"
+	isandroid=love.system.getOS()=="Android"
 	tx1, tx2, ty1, ty2 = 0,0,0,0
 	t12x = -1
 	t12y = -1
 	
 	--Sima változók
 	kameralock = false
+
+	env:ujObj({-50,-50,-30,50,40,40})
 	
-	player.id = facreate(0,0) --env:ujObj({-10,-10,10,-10,10,10,-10,10})
-	
-	--env:addObj(player.id,{-50,-50,-30,-50,-40,-40})
+	player.id = facreate(-700,-700) --env:ujObj({-10,-10,10,-10,10,10,-10,10})
 
     env:getObj(player.id):getBody():setAngularVelocity(0.3)
 
-	--env:ujObj({200,200,150,170,180,110,135,167,123,110})
-
-	--env:getObj(2):getBody():setAngularVelocity(1)
+	env:getObj( env:ujObj({200,200,150,170,180,110,135,167,123,110}) ):getBody():setAngularVelocity(-1)
 
 	love.mouse.setPosition(Aksz,Akm)
 
@@ -48,7 +46,8 @@ function love.load()
 	kiir:new("F8 - Debug",33)
 	kiir:new("Görgö - Zoom",34)
 	kiir:new("B - kiirteszt",35)
-	kiir:new("ESC - kilépés",36)
+	kiir:new("R - kameraforgatás (kameralock esetében is!)",36)
+	kiir:new("ESC - kilépés",37)
 
 
 end
@@ -66,7 +65,7 @@ end
 function love.draw()
 
 	kamera:aPos(player.x,player.y) --kamera beállítása: player közepe - képernyő méret fele * nagyitás
-	kamera:aRot(player.r)
+	kamera:aRot(player.r+player.kr)
 	kamera:set()
 	
 	env:draw()
@@ -80,7 +79,7 @@ function love.draw()
 	
 	kiir:draw(10,Am-25,nil,DEBUG) --kiirasok
 
-	love.graphics.print(player.x.."       "..player.y,10,10)
+	love.graphics.print(player.x.."       "..player.y.."\n"..mx.."      "..my,10,10)
 
 end
 
