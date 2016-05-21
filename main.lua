@@ -18,6 +18,7 @@ function love.load()
 	
 	--Mobilos változók
 	isandroid=love.system.getOS()=="Android"
+ 	tue = {}
 	
 	--Sima változók
 	kameralock = false
@@ -110,9 +111,50 @@ end
 
 
 function love.touchmoved(id, x, y, dx, dy)
-	--player.x = player.x+(x-dx)
-	--player.y = player.y+(y-dy)
-	kiir:new( (x-dx).."	"..(y-dy) )
+
+	if tue[1]~=nil and tue[2]~=nil then
+		if tue[1].id==id then 
+			if ((tue[2].x-x)^2+(tue[2].y-y)^2)^(1/2)<((tue[2].x-tue[1].x)^2+(tue[2].y-tue[1].y)^2)^(1/2) then
+				--kiir:new("1+",0.5)
+				kamera:rScale(0.01)
+			else
+ 				--kiir:new("1-",0.5)
+ 				kamera:rScale(-0.01)
+			end
+			tue[1].x=x
+			tue[1].y=y
+		end
+
+		if tue[2].id==id then
+			if ((tue[1].x-x)^2+(tue[1].y-y)^2)^(1/2)<((tue[1].x-tue[2].x)^2+(tue[1].y-tue[2].y)^2)^(1/2) then 
+				--kiir:new("2+",0.5)
+				kamera:rScale(0.01)
+			else
+				--kiir:new("2-",0.5)
+				kamera:rScale(-0.01)
+			end
+			tue[2].x=x
+			tue[2].y=y
+		end
+	elseif tue[2]==nil then
+		player.x = player.x-dx
+		player.y = player.y-dy
+	end
+end
+
+function love.touchpressed(id,x,y)
+	t = {}
+	t.x=x
+	t.y=y
+	t.id=id
+	table.insert(tue,t)
+	--kiir:new(#tue.." p")
+	if #tue==3 then love.keypressed("menu") end
+end
+
+function love.touchreleased(id,x,y)
+	table.remove(tue,#tue)
+	--kiir:new((#tue+1).." t")
 end
 
 
@@ -127,10 +169,10 @@ end
 function goFullscreen()
 	local maxRes = getMaxResolution()
 	love.window.setMode(
-		1280,--maxRes.width,
-		1024,--maxRes.height,
+		maxRes.width,
+		maxRes.height,
 		{
-			--fullscreen = true,
+			fullscreen = true,
 			vsync = true
 		}
 	)
