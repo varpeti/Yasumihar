@@ -36,8 +36,6 @@ end
 function kiir:draw(x,y,felvagyle,osszes,helyköz) -- x,y,upordown,all,linespace
 	x = x or kiir.alap.x
 	y = y or kiir.alap.y
-	felvagyle = felvagyle or kiir.alap.felvagyle
-	osszes = osszes or kiir.alap.osszes
 	helyköz = helyköz or kiir.alap.helyköz
 
 	local pos

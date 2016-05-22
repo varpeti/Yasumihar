@@ -14,21 +14,22 @@ function player:update(dt)
 
 	player.speed = 1000/ (kamera:gScale())^(1/2)
 
-	if love.keyboard.isDown("d") or (love.mouse.getX()>=Asz*0.95 and not player.isandroid) then
+	if love.keyboard.isDown("d") --[[or (love.mouse.getX()>=kepernyo.Asz*0.95 and not player.isandroid)--]] then
 		player.x=player.x+dt*player.speed
 	end
-	if love.keyboard.isDown("a") or (love.mouse.getX()<=Asz*0.05 and not player.isandroid) then
+	if love.keyboard.isDown("a") --[[or (love.mouse.getX()<=kepernyo.Asz*0.05 and not player.isandroid)--]] then
 		player.x=player.x-dt*player.speed
 	end
-	if love.keyboard.isDown("s") or (love.mouse.getY()>=Am*0.95 and not player.isandroid) then
+	if love.keyboard.isDown("s") --[[or (love.mouse.getY()>=kepernyo.Am*0.95 and not player.isandroid) --]] then
 	   	player.y=player.y+dt*player.speed
 	end
-	if love.keyboard.isDown("w") or (love.mouse.getY()<=Am*0.05 and not player.isandroid) then
+	if love.keyboard.isDown("w") --[[or (love.mouse.getY()<=kepernyo.Am*0.05 and not player.isandroid) --]] then
 	   	player.y=player.y-dt*player.speed
 	end
-	if love.keyboard.isDown("r")  then
+	--[[if love.keyboard.isDown("r")  then
     	player.r=player.r-0.01
-  	end
+  	end--]]
+
 	if kameralock then
 		local body = env:getObj(player.id):getBody()
 		player.x,player.y = body:getPosition()
@@ -36,9 +37,14 @@ function player:update(dt)
     end
 end
 
+function player.wheelmoved(x,y)
+	if y>0 then kamera:rScale(-0.1) end
+	if y<0 then kamera:rScale(0.1) end
+end
+
 function player.keypressed(key)
 	if key == "escape" then
-		love.event.quit()
+		statusz:exit()
 	end
 	if key == "menu" or key=="space" then
 		if kameralock then kameralock=false player.r=0 else kameralock=true end
@@ -46,6 +52,15 @@ function player.keypressed(key)
 	if key == "f8" then
 		DEBUG = not DEBUG
 	end
+	if key == "f11" then
+		if fullsreen then
+    		kepernyo:setmode(1280,720,0,true,2,1)
+    		fullsreen=false
+    	else
+    		kepernyo:setmode(0,0,1,true,2,1)
+    		fullsreen=true
+    	end
+    end
 	if key == "b" then
 		kiir:new("Ido: "..os.time())
 	end
@@ -55,17 +70,31 @@ function player.keyreleased(key)
 	
 end
 
-function player.touchpressed(id,x,y)
+function player.mousepressed(x,y,id,button)
 	t = {}
 	t.x=x
 	t.y=y
-	t.id=id
+	if id==nil then 
+		t.id = button 
+	else
+		t.id=id
+	end
 	table.insert(player.tue,t)
 	if #player.tue==3 then player.keypressed("menu") end
+
+	if button==1 then
+		x,y  = kamera:worldCoords(x-(kepernyo.Asz/2),y-(kepernyo.Am/2))
+		for i=1,env.IDs do
+			local fixture = env:getObj(i)
+			if fixture~=nil and fixture:testPoint(x,y) then 
+				env:removeObj(i)
+				kiir:new(i) 
+			end
+		end
+	end
 end
 
-function player.touchmoved(id, x, y, dx, dy)
-
+function player.mousemoved(x,y,dx,dy,id)
 	if player.tue[1]~=nil and player.tue[2]~=nil then
 		if player.tue[1].id==id then 
 			if ((player.tue[2].x-x)^2+(player.tue[2].y-y)^2)^(1/2)<((player.tue[2].x-player.tue[1].x)^2+(player.tue[2].y-player.tue[1].y)^2)^(1/2) then
@@ -86,13 +115,13 @@ function player.touchmoved(id, x, y, dx, dy)
 			player.tue[2].x=x
 			player.tue[2].y=y
 		end
-	elseif player.tue[2]==nil then
+	elseif player.tue[2]==nil and player.tue[1]~=nil then
 		player.x = player.x-dx
 		player.y = player.y-dy
 	end
 end
 
-function player.touchreleased(id,x,y)
+function player.mousereleased(x,y,id,button)
 	table.remove(player.tue,#player.tue)
 end
 

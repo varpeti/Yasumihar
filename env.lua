@@ -95,6 +95,8 @@ end
 
 function env:newObj(pID,coords,szin)
 
+	if #coords<(2*3) or #coords>(2*8) then return end
+
 	local x,y = CoM(coords)
 
 	local body = love.physics.newBody(self.world, x, y, "dynamic") -- test
@@ -107,12 +109,25 @@ end
 
 function env:addObj(pID,ID,coords,szin)
 
+	if #coords<(2*3) or #coords>(2*8) then return end
+
 	local x,y = CoM(coords)
 	local body = self:getObj(ID):getBody()
 	local shape = love.physics.newPolygonShape(unpack(coords)) 
 	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
 
 	return DatA(pID,fixture,szin)
+end
+
+function env:removeObj(ID)
+	local fixture = self:getObj(ID)
+	local body = self:getObj(ID):getBody()
+	if #body:getFixtureList()==1 then
+		body:destroy()
+	else
+		fixture:destroy()
+	end
+
 end
 
 --get
@@ -156,7 +171,6 @@ function env:draw()
 				local points = {body:getWorldPoints(shape:getPoints())}
 				love.graphics.setColor(DATA.szin.rr,DATA.szin.gg,DATA.szin.bb,122)
 				love.graphics.polygon("fill",points)
-				print()
 				love.graphics.setColor(env.playerek[DATA.pID].teamcolor.rr,env.playerek[DATA.pID].teamcolor.gg,env.playerek[DATA.pID].teamcolor.bb,255)
 				love.graphics.polygon("line",points)
 			elseif (shapeType == "edge") then
@@ -170,6 +184,7 @@ function env:draw()
 				love.graphics.setColor(255,255,255,255)
 				local x,y = body:getPosition()
 				love.graphics.circle("fill",x,y,5,15)
+				love.graphics.print(DATA.ID,x+5,y)
 			end
 		end
 	end		
