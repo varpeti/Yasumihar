@@ -6,36 +6,24 @@ love.physics.setMeter(10) --10 pixel = 1 méter
 env.world = love.physics.newWorld(0, 0, true) -- világ létrehozása 0, 0 gravitációval
 env.IDs = 0 -- számláló
 
+env.playerek = {}
+
 --[[
 	DATA T
-		ID 
-		szin1 T
-			rr
-			gg
-			bb
-		szin2 T
+		ID
+		pID
+		szin T
 			rr
 			gg
 			bb
 		img
-		rpos
-			ID
-			x
-			y
-		stat T
-			HP
-			Armor
-				rr
-				gg
-				bb
-			Energia
-		dot T
-			dmg
-				rr
-				gg
-				bb
-			time
-			x
+	-------------
+	PLAYER T
+		pID
+		teamcolor
+			rr
+			gg
+			bb
 ]]
 
 --------
@@ -63,31 +51,22 @@ local function CoM(coords)
 	return maxx/o, maxy/o -- A tömeg középpont
 end
 
-local function DatA(fixture,szin1,szin2)
+local function DatA(pID,fixture,szin,teamcolor)
 
 	local DATA = {}
 		env.IDs = env.IDs+1 -- növelem a számlálót
 		DATA.ID = env.IDs
-		DATA.szin1 = {}
-		if szin1 ~= nil then
-			DATA.szin1.rr = szin1.rr
-			DATA.szin1.gg = szin1.gg
-			DATA.szin1.bb = szin1.bb
+		DATA.szin = {}
+		if szin ~= nil then
+			DATA.szin.rr = szin.rr
+			DATA.szin.gg = szin.gg
+			DATA.szin.bb = szin.bb
 		else
-			DATA.szin1.rr = math.random(122,255)
-			DATA.szin1.gg = math.random(122,255)
-			DATA.szin1.bb = math.random(122,255)
+			DATA.szin.rr = math.random(122,255)
+			DATA.szin.gg = math.random(122,255)
+			DATA.szin.bb = math.random(122,255)
 		end
-		DATA.szin2 = {}
-		if szin2 ~= nil then
-			DATA.szin2.rr = szin2.rr
-			DATA.szin2.gg = szin2.gg
-			DATA.szin2.bb = szin2.bb
-		else
-			DATA.szin2.rr = math.random(122,255)
-			DATA.szin2.gg = math.random(122,255)
-			DATA.szin2.bb = math.random(122,255)
-		end
+		DATA.pID = pID
 	fixture:setUserData(DATA)
 	return DATA.ID
 end
@@ -98,7 +77,23 @@ end
 
 --set
 
-function env:newObj(coords,szin1,szin2)
+function env:newPlayer(pID,teamcolor)
+	local PLAYER = {}
+		if teamcolor ~= nil then
+			teamcolor.rr = teamcolor.rr
+			teamcolor.gg = teamcolor.gg
+			teamcolor.bb = teamcolor.bb
+		else
+			teamcolor = {}
+			teamcolor.rr = math.random(122,255)
+			teamcolor.gg = math.random(122,255)
+			teamcolor.bb = math.random(122,255)
+		end
+		PLAYER.teamcolor = teamcolor
+	env.playerek[pID]=PLAYER -- pID hez rendeli a szint
+end
+
+function env:newObj(pID,coords,szin)
 
 	local x,y = CoM(coords)
 
@@ -106,18 +101,18 @@ function env:newObj(coords,szin1,szin2)
 	local shape = createshape(x,y,coords)-- shape: a coords (0;0) pontja az x,y-on van
 	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
 
-	return DatA(fixture,szin1,szin2)
+	return DatA(pID,fixture,szin)
 	
 end
 
-function env:addObj(ID,coords,szin1,szin2)
+function env:addObj(pID,ID,coords,szin)
 
 	local x,y = CoM(coords)
 	local body = self:getObj(ID):getBody()
 	local shape = love.physics.newPolygonShape(unpack(coords)) 
 	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
 
-	return DatA(fixture,szin1,szin2)
+	return DatA(pID,fixture,szin)
 end
 
 --get
@@ -129,6 +124,16 @@ function env:getObj(ID)
 		end
 	end
 	return nil
+end
+
+function env:getPlayerObjs(pID)
+	ids = {}
+	for b,body in ipairs(env.world:getBodyList()) do
+		for f,fixture in ipairs(body:getFixtureList()) do
+			if pID == fixture:getUserData().pID then table.insert(ids,fixture:getUserData().ID) end
+		end
+	end
+	return ids
 end
 
 -- draw, update
@@ -143,15 +148,16 @@ function env:draw()
 			if (shapeType == "circle") then
 				local x,y = body:getWorldPoint(shape:getPoint())
 				local radius = shape:getRadius()
-				love.graphics.setColor(DATA.szin1.rr,DATA.szin1.gg,DATA.szin1.bb,255)
+				love.graphics.setColor(DATA.szin.rr,DATA.szin.gg,DATA.szin.bb,255)
 				love.graphics.circle("fill",x,y,radius,15)
-				love.graphics.setColor(DATA.szin2.rr,DATA.szin2.gg,DATA.szin2.bb,255)
+				love.graphics.setColor(env.playerek[DATA.pID].teamcolor.rr,env.playerek[DATA.pID].teamcolor.gg,env.playerek[DATA.pID].teamcolor.bb,255)
 				love.graphics.circle("line",x,y,radius,15)
 			elseif (shapeType == "polygon") then
 				local points = {body:getWorldPoints(shape:getPoints())}
-				love.graphics.setColor(DATA.szin1.rr,DATA.szin1.gg,DATA.szin1.bb,122)
+				love.graphics.setColor(DATA.szin.rr,DATA.szin.gg,DATA.szin.bb,122)
 				love.graphics.polygon("fill",points)
-				love.graphics.setColor(DATA.szin2.rr,DATA.szin2.gg,DATA.szin2.bb,255)
+				print()
+				love.graphics.setColor(env.playerek[DATA.pID].teamcolor.rr,env.playerek[DATA.pID].teamcolor.gg,env.playerek[DATA.pID].teamcolor.bb,255)
 				love.graphics.polygon("line",points)
 			elseif (shapeType == "edge") then
 				love.graphics.setColor(0,0,0,255)
