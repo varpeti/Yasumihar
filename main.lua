@@ -4,12 +4,13 @@ kamera = require('kamera')
 player = require('player')
 kiir = require('kiir')
 env = require('env')
+kepernyo = require('kepernyo')
 require('fa')
 
 
 function love.load()
 	--ablak beállítások
-	goFullscreen()
+	kepernyo:goFullscreen()
 	Asz=love.graphics.getWidth()
 	Am=love.graphics.getHeight()
 	Aksz=Asz/2 Akm=Am/2
@@ -155,25 +156,4 @@ end
 function love.touchreleased(id,x,y)
 	table.remove(tue,#tue)
 	--kiir:new((#tue+1).." t")
-end
-
-
--- teljes képernyő
-
-function getMaxResolution()
-	local modes = love.window.getFullscreenModes()
-	table.sort(modes, function(a, b) return a.width*a.height > b.width*b.height end) -- sort from largest to smallest
-	return modes[1]
-end
-
-function goFullscreen()
-	local maxRes = getMaxResolution()
-	love.window.setMode(
-		maxRes.width,
-		maxRes.height,
-		{
-			fullscreen = true,
-			vsync = true
-		}
-	)
 end
