@@ -57,15 +57,13 @@ end
 
 --Input eventek (player.lua)
 
-function love.mousepressed(x,y,button)
+function love.mousepressed(x,y,button,istouch)
+	if istouch then return end -- touchnál meghívná még1x
 	player.mousepressed(x,y,nil,button)
 end
 
-function love.mousemoved(x,y,dx,dy)
-	player.mousemoved(x,y,dx,dy,nil)
-end
-
-function love.mousereleased(x,y,button)
+function love.mousereleased(x,y,button,istouch)
+	if istouch then return end
 	player.mousereleased(x,y,nil,button)
 end
 
@@ -86,7 +84,7 @@ function love.touchpressed(id,x,y)
 end
 
 function love.touchmoved(id,x,y,dx,dy)
-	player.mousemoved(x,y,dx,dy,id)
+	player.touchmoved(x,y,dx,dy,id)
 end
 
 function love.touchreleased(id,x,y)

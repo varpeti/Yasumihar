@@ -94,7 +94,8 @@ function player.mousepressed(x,y,id,button)
 	end
 end
 
-function player.mousemoved(x,y,dx,dy,id)
+function player.touchmoved(x,y,dx,dy,id)
+	kiir:new(#player.tue)
 	if player.tue[1]~=nil and player.tue[2]~=nil then
 		if player.tue[1].id==id then 
 			if ((player.tue[2].x-x)^2+(player.tue[2].y-y)^2)^(1/2)<((player.tue[2].x-player.tue[1].x)^2+(player.tue[2].y-player.tue[1].y)^2)^(1/2) then
