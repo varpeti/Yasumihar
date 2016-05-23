@@ -4,7 +4,7 @@ local server = {}
 
 function server:init()
 
-	local file = io.open("port.txt","r")
+	local file = io.open("port","r")
 	server.host = enet.host_create("*:"..file:read("*all")) 
 	file:close()
 end

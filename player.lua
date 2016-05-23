@@ -36,7 +36,8 @@ end
 
 function player.keypressed(key)
 	if key == "escape" then
-		love.event.quit()
+		--love.event.quit()
+		env:removeObj()
 	end
 	if key == "menu" or key=="space" then
 		if kameralock then kameralock=false else kameralock=true end

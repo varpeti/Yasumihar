@@ -4,7 +4,7 @@ local client = {}
 
 function client:init()
 	client.host = enet.host_create()
-	local file = io.open("port.txt","r")
+	local file = io.open("port","r")
 	client.server = client.host:connect("192.168.0.23:"..file:read("*all")) 
 	file:close()
 end
