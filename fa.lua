@@ -14,16 +14,16 @@ function facreate(pID,x,y)
 			sz=sz+ (3.141592653589793238462643383279*2/p) + math.random(-0.5000,0.5000)
 		end
 		if j>1 then
-			if     f.l==7 then env:addObj(pID,ID,coords,{rr=000,gg=255,bb=000},{rr=255,gg=255,bb=255})--{rr=255,gg=000,bb=255}) 	
-			elseif f.l==6 then env:addObj(pID,ID,coords,{rr=000,gg=000,bb=255},{rr=255,gg=255,bb=255})--{rr=255,gg=255,bb=000}) 	
-			elseif f.l==5 then env:addObj(pID,ID,coords,{rr=255,gg=255,bb=000},{rr=255,gg=255,bb=255})--{rr=000,gg=000,bb=255}) 	
-			elseif f.l==4 then env:addObj(pID,ID,coords,{rr=255,gg=150,bb=000},{rr=255,gg=255,bb=255})--{rr=000,gg=105,bb=255}) 	
-			elseif f.l==3 then env:addObj(pID,ID,coords,{rr=100,gg=200,bb=200},{rr=255,gg=255,bb=255})--{rr=155,gg=055,bb=055})
-			elseif f.l==2 then env:addObj(pID,ID,coords,{rr=000,gg=200,bb=000},{rr=255,gg=255,bb=255})--{rr=255,gg=055,bb=255}) 	
-			elseif f.l==1 then env:addObj(pID,ID,coords,{rr=000,gg=000,bb=000},{rr=255,gg=255,bb=255})--{rr=255,gg=255,bb=255})
+			if     f.l==7 then env:addObj(pID,ID,coords,{rr=000,gg=255,bb=000})--{rr=255,gg=000,bb=255}) 	
+			elseif f.l==6 then env:addObj(pID,ID,coords,{rr=000,gg=000,bb=255})--{rr=255,gg=255,bb=000}) 	
+			elseif f.l==5 then env:addObj(pID,ID,coords,{rr=255,gg=255,bb=000})--{rr=000,gg=000,bb=255}) 	
+			elseif f.l==4 then env:addObj(pID,ID,coords,{rr=255,gg=150,bb=000})--{rr=000,gg=105,bb=255}) 	
+			elseif f.l==3 then env:addObj(pID,ID,coords,{rr=100,gg=200,bb=200})--{rr=155,gg=055,bb=055})
+			elseif f.l==2 then env:addObj(pID,ID,coords,{rr=000,gg=200,bb=000})--{rr=255,gg=055,bb=255}) 	
+			elseif f.l==1 then env:addObj(pID,ID,coords,{rr=000,gg=000,bb=000})--{rr=255,gg=255,bb=255})
 			end
 		else
-			ID = env:newObj(pID,coords,{rr=255,gg=0,bb=0},{rr=255,gg=255,bb=255},true)--{rr=0,gg=0,bb=255})
+			ID = env:newObj(pID,coords,{rr=255,gg=0,bb=0})--{rr=0,gg=0,bb=255})
 		end
 	end
 	while 1<=#fa do

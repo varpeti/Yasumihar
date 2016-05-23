@@ -36,7 +36,7 @@ end
 function kiir:draw(x,y,felvagyle,osszes,helyköz) -- x,y,upordown,all,linespace
 	x = x or kiir.alap.x
 	y = y or kiir.alap.y
-	helyköz = helyköz or kiir.alap.helyköz
+	helyköz = helyköz or love.graphics.getFont():getHeight()
 
 	local pos
 	if osszes then 
@@ -66,7 +66,7 @@ function kiir:set(x,y,ido,felvagyle,osszes,helyköz)
 	kiir.alap.ido = ido or 5 -- time (sec)
 	kiir.alap.felvagyle = felvagyle or false -- up or down (false=down)
 	kiir.alap.osszes = osszes or false -- all (false= only the actives)
-	kiir.alap.helyköz = helyköz or 12 -- line space (pixel)
+	kiir.alap.helyköz = helyköz or nil -- line space (pixel) (nil = get currently size)
 end
 
 kiir:set() -- alap beállítások

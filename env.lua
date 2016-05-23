@@ -17,9 +17,10 @@ env.playerek = {}
 			gg
 			bb
 		img
+		szoveg
+
 	-------------
-	PLAYER T
-		pID
+	PLAYER T (pID indexel)
 		teamcolor
 			rr
 			gg
@@ -51,7 +52,7 @@ local function CoM(coords)
 	return maxx/o, maxy/o -- A tömeg középpont
 end
 
-local function DatA(pID,fixture,szin,teamcolor)
+local function DatA(pID,fixture,szin,szoveg)
 
 	local DATA = {}
 		env.IDs = env.IDs+1 -- növelem a számlálót
@@ -66,6 +67,7 @@ local function DatA(pID,fixture,szin,teamcolor)
 			DATA.szin.gg = math.random(122,255)
 			DATA.szin.bb = math.random(122,255)
 		end
+		DATA.szoveg = szoveg
 		DATA.pID = pID
 	fixture:setUserData(DATA)
 	return DATA.ID
@@ -93,7 +95,7 @@ function env:newPlayer(pID,teamcolor)
 	env.playerek[pID]=PLAYER -- pID hez rendeli a szint
 end
 
-function env:newObj(pID,coords,szin)
+function env:newObj(pID,coords,szin,szoveg)
 
 	if #coords<(2*3) or #coords>(2*8) then return end
 
@@ -103,11 +105,11 @@ function env:newObj(pID,coords,szin)
 	local shape = createshape(x,y,coords)-- shape: a coords (0;0) pontja az x,y-on van
 	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
 
-	return DatA(pID,fixture,szin)
+	return DatA(pID,fixture,szin,szoveg)
 	
 end
 
-function env:addObj(pID,ID,coords,szin)
+function env:addObj(pID,ID,coords,szin,szoveg)
 
 	if #coords<(2*3) or #coords>(2*8) then return end
 
@@ -116,16 +118,24 @@ function env:addObj(pID,ID,coords,szin)
 	local shape = love.physics.newPolygonShape(unpack(coords)) 
 	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
 
-	return DatA(pID,fixture,szin)
+	return DatA(pID,fixture,szin,szoveg)
 end
 
 function env:removeObj(ID)
-	local fixture = self:getObj(ID)
-	local body = self:getObj(ID):getBody()
-	if #body:getFixtureList()==1 then
-		body:destroy()
+	if ID~=nil then
+		local fixture = self:getObj(ID)
+		local body = self:getObj(ID):getBody()
+		if #body:getFixtureList()==1 then
+			body:destroy()
+		else
+			fixture:destroy()
+		end
 	else
-		fixture:destroy()
+		for i=1, env.IDs do
+			local fixture = env:getObj(i)
+			if fixture~=nil then fixture:getBody():destroy() end
+		end
+		env.IDs=0
 	end
 
 end
@@ -185,6 +195,17 @@ function env:draw()
 				local x,y = body:getPosition()
 				love.graphics.circle("fill",x,y,5,15)
 				love.graphics.print(DATA.ID,x+5,y)
+			end
+			if DATA.szoveg~=nil then
+
+				love.graphics.setFont(fmenu);
+				love.graphics.setColor(255,255,255,255)
+
+				local x,y = body:getPosition()
+				local font = love.graphics.getFont()
+				local w,h = font:getWidth(DATA.szoveg), font:getHeight()
+
+				love.graphics.print(DATA.szoveg,x-(w/2),y-(h/2))
 			end
 		end
 	end		

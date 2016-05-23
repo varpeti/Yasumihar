@@ -42,7 +42,7 @@ function kamera:rScale(sx,sy) --relat
 	self.sy = self.sy+self.sy*(sy or sx)
 end
 
-function kamera:aScale(sx,sy) --abs -- original: 0,0
+function kamera:aScale(sx,sy) --abs -- original: 1,1
     self.sx = sx
     self.sy = (sy or sx)
 end

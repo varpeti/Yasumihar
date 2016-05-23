@@ -14,21 +14,21 @@ function player:update(dt)
 
 	player.speed = 1000/ (kamera:gScale())^(1/2)
 
-	if love.keyboard.isDown("d") --[[or (love.mouse.getX()>=kepernyo.Asz*0.95 and not player.isandroid)--]] then
+	if love.keyboard.isDown("d") or (love.mouse.getX()>=kepernyo.Asz*0.95 and not player.isandroid) then
 		player.x=player.x+dt*player.speed
 	end
-	if love.keyboard.isDown("a") --[[or (love.mouse.getX()<=kepernyo.Asz*0.05 and not player.isandroid)--]] then
+	if love.keyboard.isDown("a") or (love.mouse.getX()<=kepernyo.Asz*0.05 and not player.isandroid) then
 		player.x=player.x-dt*player.speed
 	end
-	if love.keyboard.isDown("s") --[[or (love.mouse.getY()>=kepernyo.Am*0.95 and not player.isandroid) --]] then
+	if love.keyboard.isDown("s") or (love.mouse.getY()>=kepernyo.Am*0.95 and not player.isandroid)  then
 	   	player.y=player.y+dt*player.speed
 	end
-	if love.keyboard.isDown("w") --[[or (love.mouse.getY()<=kepernyo.Am*0.05 and not player.isandroid) --]] then
+	if love.keyboard.isDown("w") or (love.mouse.getY()<=kepernyo.Am*0.05 and not player.isandroid)  then
 	   	player.y=player.y-dt*player.speed
 	end
-	--[[if love.keyboard.isDown("r")  then
+	if love.keyboard.isDown("r")  then
     	player.r=player.r-0.01
-  	end--]]
+  	end
 
 	if kameralock then
 		local body = env:getObj(player.id):getBody()
@@ -38,8 +38,8 @@ function player:update(dt)
 end
 
 function player.wheelmoved(x,y)
-	if y>0 then kamera:rScale(-0.1) end
-	if y<0 then kamera:rScale(0.1) end
+	if y>0 and statusz.zoomenabled then kamera:rScale(-0.1) end
+	if y<0 and statusz.zoomenabled then kamera:rScale(0.1) end
 end
 
 function player.keypressed(key)
@@ -87,8 +87,7 @@ function player.mousepressed(x,y,id,button)
 		for i=1,env.IDs do
 			local fixture = env:getObj(i)
 			if fixture~=nil and fixture:testPoint(x,y) then 
-				env:removeObj(i)
-				kiir:new(i) 
+				statusz:kijelol(i)
 			end
 		end
 	end
@@ -99,9 +98,9 @@ function player.touchmoved(x,y,dx,dy,id)
 	if player.tue[1]~=nil and player.tue[2]~=nil then
 		if player.tue[1].id==id then 
 			if ((player.tue[2].x-x)^2+(player.tue[2].y-y)^2)^(1/2)<((player.tue[2].x-player.tue[1].x)^2+(player.tue[2].y-player.tue[1].y)^2)^(1/2) then
-				kamera:rScale(0.01)
+				if statusz.zoomenabled then kamera:rScale(0.01) end
 			else
- 				kamera:rScale(-0.01)
+ 				if statusz.zoomenabled then kamera:rScale(-0.01) end
 			end
 			player.tue[1].x=x
 			player.tue[1].y=y
@@ -109,9 +108,9 @@ function player.touchmoved(x,y,dx,dy,id)
 
 		if player.tue[2].id==id then
 			if ((player.tue[1].x-x)^2+(player.tue[1].y-y)^2)^(1/2)<((player.tue[1].x-player.tue[2].x)^2+(player.tue[1].y-player.tue[2].y)^2)^(1/2) then 
-				kamera:rScale(0.01)
+				if statusz.zoomenabled then kamera:rScale(0.01) end
 			else
-				kamera:rScale(-0.01)
+				if statusz.zoomenabled then kamera:rScale(-0.01) end
 			end
 			player.tue[2].x=x
 			player.tue[2].y=y

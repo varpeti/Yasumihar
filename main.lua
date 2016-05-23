@@ -22,6 +22,10 @@ function love.load()
 	DEBUG = false
 	fullsreen = false
 
+	fmenu = love.graphics.newFont(48)
+	fkiiras = love.graphics.newFont(16)
+	kiir:set(nil,nil,10,true,DEBUG,12)
+
 end
 
 function love.update(dt)
@@ -51,6 +55,7 @@ function love.draw()
 
 	if DEBUG then love.graphics.print(player.x.."       "..player.y.."\n"..mx.."      "..my,10,10) end
 
+	love.graphics.setFont(fkiiras);
 	kiir:draw(10,kepernyo.Am-25,true,DEBUG) --kiirasok
 
 end
