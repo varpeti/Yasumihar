@@ -24,24 +24,63 @@ function love.load()
 
 	fmenu = love.graphics.newFont(48)
 	fkiiras = love.graphics.newFont(16)
+	fkicsi = love.graphics.newFont(10)
 	kiir:set(nil,nil,10,true,DEBUG,12)
+
+	env:setCallbacks()
+
+	env:newPlayer("Gaia",{rr=000,gg=200,bb=200})
+	
+	env:newObj("Gaia",{-50,-50,-30,50,40,40})
+	env:addObj("Gaia",1,{200,200,150,170,180,110,135,167,123,110})
+	env:getObj(1):getBody():setPosition(200,0)
+		
+	env:newObj("Gaia",{-50,-50,-30,50,40,40})
+    env:newObj("Gaia",{200,200,150,170,180,110,135,167,123,110})
+		
+	env:newPlayer("Player001",{rr=255,gg=255,bb=255})
+	player.id = facreate("Player001",-700,-700)
+		
+    env:getObj(player.id):getBody():setAngularVelocity(0.3)
+		
+	env:getObj(1):getBody():setAngularVelocity(-0.1)
+		
+	love.mouse.setPosition(love.graphics.getWidth()/2,love.graphics.getHeight()/2)
+
+	kiir:new("",46)
+	kiir:new("Gombok:",30)
+	kiir:new("WASD, egér - kamera mozgás",31)
+	kiir:new("SPACE - kameralock",32)
+	kiir:new("F8 - Debug",33)
+	kiir:new("Görgö - Zoom",34)
+	kiir:new("B - kiirteszt",35)
+	kiir:new("R - kameraforgatás",36)
+	kiir:new("F11 - teljesképernyö",37)
+	kiir:new("Kattintás - objektum törlés",38)
+	kiir:new("",39)
+	kiir:new("Android:",40)
+	kiir:new("Húzás - kameramozgatás",41)
+	kiir:new("2 új - zoom",42)
+	kiir:new("3 új - kameralock",43)
+	kiir:new("ESC - vissza, kilépés",44)
+	kiir:new("",45)
+	kiir:new([[Balra fel van a "hajó"]],20)
 
 end
 
 function love.update(dt)
 
-	statusz:update(dt)
+	env:update(dt) --ez kell a fizikai világ frissítéshez
 
-	kiir:update(dt)
+	player:update(dt) --ez kell az irányításhoz
+
+	kiir:update(dt) -- kiírások
 
 end
 
 function love.draw()
 
-	statusz:draw()
-
 	kamera:aPos(player.x,player.y) --kamera beállítása: player közepe - képernyő méret fele * nagyitás
-	kamera:aRot(player.r)
 	kamera:set()
 	
 	env:draw()
@@ -52,11 +91,20 @@ function love.draw()
 	kamera:unset()
 	
 	love.graphics.setColor(255,255,255,255)
+	love.graphics.setFont(fkicsi);
 
-	if DEBUG then love.graphics.print(player.x.."       "..player.y.."\n"..mx.."      "..my,10,10) end
+	if DEBUG then 
+		love.graphics.print(player.x.."       "..player.y.."\n"..mx.."      "..my,10,10) 
+		local text = ""
+		for k,v in pairs(_G) do
+			if type(v)~="function" then text = text..k..": "..type(v).."\n" end
+		end
+		love.graphics.print(text,500,10)
+	end
 
 	love.graphics.setFont(fkiiras);
 	kiir:draw(10,kepernyo.Am-25,true,DEBUG) --kiirasok
+
 
 end
 

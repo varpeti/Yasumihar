@@ -121,6 +121,8 @@ function env:addObj(pID,ID,coords,szin,szoveg)
 	return DatA(pID,fixture,szin,szoveg)
 end
 
+--func
+
 function env:removeObj(ID)
 	if ID~=nil then
 		local fixture = self:getObj(ID)
@@ -138,6 +140,10 @@ function env:removeObj(ID)
 		env.IDs=0
 	end
 
+end
+
+function env:kijelol(ID)
+	kiir:new(ID)
 end
 
 --get
@@ -183,18 +189,18 @@ function env:draw()
 				love.graphics.polygon("fill",points)
 				love.graphics.setColor(env.playerek[DATA.pID].teamcolor.rr,env.playerek[DATA.pID].teamcolor.gg,env.playerek[DATA.pID].teamcolor.bb,255)
 				love.graphics.polygon("line",points)
+				if DEBUG then 
+					love.graphics.setColor(255,255,255,255)
+					love.graphics.print(DATA.ID,points[1],points[2]) 
+					local x,y = body:getPosition()
+					love.graphics.line(x,y,points[1],points[2])
+				end
 			elseif (shapeType == "edge") then
 				love.graphics.setColor(0,0,0,255)
 				love.graphics.line(body:getWorldPoint(shape:getPoint()))
 			elseif (shapeType == "chain") then
 				love.graphics.setColor(0,0,0,255)
 				love.graphics.line(body:getWorldPoint(shape:getPoint()))
-			end
-			if DEBUG then
-				love.graphics.setColor(255,255,255,255)
-				local x,y = body:getPosition()
-				love.graphics.circle("fill",x,y,5,15)
-				love.graphics.print(DATA.ID,x+5,y)
 			end
 			if DATA.szoveg~=nil then
 
@@ -207,6 +213,11 @@ function env:draw()
 
 				love.graphics.print(DATA.szoveg,x-(w/2),y-(h/2))
 			end
+		end
+		if DEBUG then
+			love.graphics.setColor(255,255,255,255)
+			local x,y = body:getPosition()
+			love.graphics.circle("fill",x,y,5,15)
 		end
 	end		
 end
