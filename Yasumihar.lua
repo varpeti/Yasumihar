@@ -39,7 +39,7 @@ function love.load()
     env:newObj("Gaia",{200,200,150,170,180,110,135,167,123,110})
 		
 	env:newPlayer("Player001",{rr=255,gg=255,bb=255})
-	player.id = facreate("Player001",-700,-700)
+	--player.id = facreate("Player001",-700,-700)
 		
     --env:getObj(player.id):getBody():setAngularVelocity(0.3)
 		
@@ -76,6 +76,10 @@ function love.update(dt)
 
 	kiir:update(dt) -- kiírások
 
+	server:update(dt)
+
+	client:update(dt)
+
 end
 
 function love.draw()
@@ -93,8 +97,8 @@ function love.draw()
 	love.graphics.setColor(255,255,255,255)
 	love.graphics.setFont(fkicsi);
 
-	if DEBUG then 
-		love.graphics.print(player.x.."       "..player.y.."\n"..mx.."      "..my.."\n"..player.kijelol.." kijelolve",10,10)  
+	if DEBUG then
+		love.graphics.print(player.x.."       "..player.y.."\n"..mx.."      "..my.."\n"..player.kijelol.." kijelolve",10,10)
 		local text = ""
 		for k,v in pairs(_G) do
 			if type(v)~="function" then text = text..k..": "..type(v).."\n" end

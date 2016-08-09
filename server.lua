@@ -3,10 +3,9 @@ require "enet"
 local server = {}
 
 function server:init()
-
-	local file = io.open("port","r")
-	server.host = enet.host_create("*:"..file:read("*all")) 
-	file:close()
+	local file = "port"
+	if not love.filesystem.exists(file) then error([[Hiányzik a "]]..file..[[" file]]) end
+	server.host = enet.host_create("*:"..love.filesystem.read(file)) 
 end
 
 function server:update(dt)
@@ -14,13 +13,16 @@ function server:update(dt)
 	if not event then return end
 	if event.type == "receive" then
 		kiir:new("Got message: "..event.data.." "..event.peer:connect_id())
-		event.peer:send("pong")
-	elseif event.type == "connect" then
+		event.peer:send("Pong")
+		elseif event.type == "connect" then
+		kiir:new("Connected: "..event.peer:connect_id())
 		env:newPlayer(event.peer:connect_id())
-		env:newObj(event.peer:connect_id(),{-50,-50,-30,50,40,40})
+		event.peer:send(facreate(event.peer:connect_id(),-700,-700))
 	elseif event.type == "disconnect" then
 		kiir:new(event.peer:connect_id() .. " disconnected.")
 	end
 end
+
+server.init()
 
 return server

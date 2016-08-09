@@ -244,17 +244,17 @@ end
 --Ütközések
 
 function beginContact(a, b, coll)
- 	kiir:new("Ütközés: A: "..table.concat({a:getBody():getPosition()},"	").."		B: "..table.concat({b:getBody():getPosition()},"	"),10)
+	kiir:new("Ütközés: A: "..table.concat({a:getBody():getPosition()},"	").."		B: "..table.concat({b:getBody():getPosition()},"	"),10)
 end
- 
+
 function endContact(a, b, coll)
 	
 end
- 
+
 function preSolve(a, b, coll)
 	
 end
- 
+
 function postSolve(a, b, coll, normalimpulse, tangentimpulse)
 	
 end

@@ -24,10 +24,12 @@ function player:update(dt)
 	end
 
 	if kameralock then
-		local body = env:getObj(player.id):getBody()
+		local friction = env:getObj(player.id)
+		if not friction then return end
+		local body = friction:getBody()
 		player.x,player.y = body:getPosition()
 		kamera:aRot(body:getAngle())
-    end
+	end
 
 end
 
@@ -49,13 +51,13 @@ function player.keypressed(key)
 	end
 	if key == "f11" then
 		if fullsreen then
-    		kepernyo:setmode(1280,720,0,true)
-    		fullsreen=false
-    	else
-    		kepernyo:setmode(0,0,1,true)
-    		fullsreen=true
-    	end
-    end
+			kepernyo:setmode(1280,720,0,true)
+			fullsreen=false
+		else
+			kepernyo:setmode(0,0,1,true)
+			fullsreen=true
+		end
+	end
 	if key == "b" then
 		kiir:new("Ido: "..os.time())
 	end
@@ -104,7 +106,7 @@ function player.mousepressed(x,y,id,button)
 				else
 					szog = math.atan(sy/sx)
 				end
-				fixture:getUserData().usD={szog=szog,ero=159999,megy=true}
+				fixture:getUserData().usD={szog=szog-body:getAngle(),ero=159999,megy=true}
 			end
 		end
 	elseif button==3 then
@@ -119,14 +121,14 @@ function player.touchmoved(x,y,dx,dy,id)
 			if ((player.tue[2].x-x)^2+(player.tue[2].y-y)^2)^(1/2)<((player.tue[2].x-player.tue[1].x)^2+(player.tue[2].y-player.tue[1].y)^2)^(1/2) then
 				kamera:rScale(0.01)
 			else
- 				kamera:rScale(-0.01)
+				kamera:rScale(-0.01)
 			end
 			player.tue[1].x=x
 			player.tue[1].y=y
 		end
 
 		if player.tue[2].id==id then
-			if ((player.tue[1].x-x)^2+(player.tue[1].y-y)^2)^(1/2)<((player.tue[1].x-player.tue[2].x)^2+(player.tue[1].y-player.tue[2].y)^2)^(1/2) then 
+			if ((player.tue[1].x-x)^2+(player.tue[1].y-y)^2)^(1/2)<((player.tue[1].x-player.tue[2].x)^2+(player.tue[1].y-player.tue[2].y)^2)^(1/2) then
 				kamera:rScale(0.01)
 			else
 				kamera:rScale(-0.01)
@@ -151,15 +153,15 @@ function player.fgv(fixture,body,shape,DATA)
 		DATA.usD.ero = DATA.usD.ero or 20000
 		if fixture==nil then return end
 		local kx, ky = body:getWorldPoints(DATA.kx,DATA.ky)
-    	body:applyForce(DATA.usD.ero*math.cos(DATA.usD.szog),DATA.usD.ero*math.sin(DATA.usD.szog),kx,ky)
-    end
+		body:applyForce(DATA.usD.ero*math.cos(DATA.usD.szog+body:getAngle()),DATA.usD.ero*math.sin(DATA.usD.szog+body:getAngle()),kx,ky)
+	end
 
-    --DRAW
+	--DRAW
 
-    love.graphics.setColor(255,255,000,255)
+	love.graphics.setColor(255,255,000,255)
 	local kx, ky = body:getWorldPoints(DATA.kx,DATA.ky)
 	if DATA.usD then 
-		love.graphics.line(200*math.cos(DATA.usD.szog)+kx,200*math.sin(DATA.usD.szog)+ky,kx,ky)
+		love.graphics.line(200*math.cos(DATA.usD.szog+body:getAngle())+kx,200*math.sin(DATA.usD.szog+body:getAngle())+ky,kx,ky)
 	end
 end
 
