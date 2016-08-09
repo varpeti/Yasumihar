@@ -41,9 +41,9 @@ function love.load()
 	env:newPlayer("Player001",{rr=255,gg=255,bb=255})
 	player.id = facreate("Player001",-700,-700)
 		
-    env:getObj(player.id):getBody():setAngularVelocity(0.3)
+    --env:getObj(player.id):getBody():setAngularVelocity(0.3)
 		
-	env:getObj(1):getBody():setAngularVelocity(-0.1)
+	env:getObj(1):getBody():setAngularVelocity(-1)
 		
 	love.mouse.setPosition(love.graphics.getWidth()/2,love.graphics.getHeight()/2)
 
@@ -94,7 +94,7 @@ function love.draw()
 	love.graphics.setFont(fkicsi);
 
 	if DEBUG then 
-		love.graphics.print(player.x.."       "..player.y.."\n"..mx.."      "..my,10,10) 
+		love.graphics.print(player.x.."       "..player.y.."\n"..mx.."      "..my.."\n"..player.kijelol.." kijelolve",10,10)  
 		local text = ""
 		for k,v in pairs(_G) do
 			if type(v)~="function" then text = text..k..": "..type(v).."\n" end

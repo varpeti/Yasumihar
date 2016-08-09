@@ -2,8 +2,9 @@ local player = {}
 
 player.x = 0
 player.y = 0
-player.isandroid=love.system.getOS()=="Android"
+player.isandroid = love.system.getOS()=="Android"
 player.tue = {}
+player.kijelol = -1
 
 function player:update(dt)
 
@@ -27,6 +28,7 @@ function player:update(dt)
 		player.x,player.y = body:getPosition()
 		kamera:aRot(body:getAngle())
     end
+
 end
 
 function player.wheelmoved(x,y)
@@ -78,10 +80,31 @@ function player.mousepressed(x,y,id,button)
 	x,y  = kamera:worldCoords(x-(kepernyo.Asz/2),y-(kepernyo.Am/2))
 	
 	if button==1 then
+		player.kijelol = -1
 		for i=1,env.IDs do
 			local fixture = env:getObj(i)
 			if fixture~=nil and fixture:testPoint(x,y) then 
 				env:kijelol(i)
+				--if i~=player.id then env:removeObj(i) end
+				player.kijelol = i
+			end
+		end
+	elseif button==2 then
+		if player.kijelol~=-1 then
+			local szog = 0
+			local fixture = env:getObj(player.kijelol)
+			if fixture~=nil then 
+				local body = fixture:getBody()
+				local DATA = fixture:getUserData()
+				local sx,sy = body:getWorldPoints(DATA.kx,DATA.ky)
+				sx = x-sx
+				sy = y-sy
+				if sx<0 then 
+					szog = 3.141592653589793238462643383279+math.atan(sy/sx)
+				else
+					szog = math.atan(sy/sx)
+				end
+				fixture:getUserData().usD={szog=szog,ero=159999,megy=true}
 			end
 		end
 	elseif button==3 then
@@ -119,6 +142,25 @@ end
 
 function player.mousereleased(x,y,id,button)
 	table.remove(player.tue,#player.tue)
+end
+
+function player.fgv(fixture,body,shape,DATA)
+
+	-- UPDATE
+	if DATA.usD.megy then
+		DATA.usD.ero = DATA.usD.ero or 20000
+		if fixture==nil then return end
+		local kx, ky = body:getWorldPoints(DATA.kx,DATA.ky)
+    	body:applyForce(DATA.usD.ero*math.cos(DATA.usD.szog),DATA.usD.ero*math.sin(DATA.usD.szog),kx,ky)
+    end
+
+    --DRAW
+
+    love.graphics.setColor(255,255,000,255)
+	local kx, ky = body:getWorldPoints(DATA.kx,DATA.ky)
+	if DATA.usD then 
+		love.graphics.line(200*math.cos(DATA.usD.szog)+kx,200*math.sin(DATA.usD.szog)+ky,kx,ky)
+	end
 end
 
 return player

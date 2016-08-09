@@ -87,7 +87,7 @@ function lines_from(file)
 end
 
 function initmenuk()
-	local l = lines_from("hu")
+	local l = lines_from(lines_from("lang")[1])
 
 	menu:newMenu("fo",{
 		menu:newMenupont(l[1],{math.random(128,255),math.random(128,255),math.random(128,255)},{255,255,255}),

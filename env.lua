@@ -18,6 +18,7 @@ env.playerek = {}
 			bb
 		img
 		szoveg
+		fgv
 
 	-------------
 	PLAYER T (pID indexel)
@@ -52,11 +53,12 @@ local function CoM(coords)
 	return maxx/o, maxy/o -- A tömeg középpont
 end
 
-local function DatA(pID,fixture,szin,szoveg)
+local function DatA(pID,fixture,szin,fgv,usD,x,y)
 
 	local DATA = {}
 		env.IDs = env.IDs+1 -- növelem a számlálót
 		DATA.ID = env.IDs
+
 		DATA.szin = {}
 		if szin ~= nil then
 			DATA.szin.rr = szin.rr
@@ -67,7 +69,13 @@ local function DatA(pID,fixture,szin,szoveg)
 			DATA.szin.gg = math.random(122,255)
 			DATA.szin.bb = math.random(122,255)
 		end
-		DATA.szoveg = szoveg
+
+		DATA.fgv = fgv
+		DATA.usD = usD
+
+		DATA.kx = x
+		DATA.ky = y
+
 		DATA.pID = pID
 	fixture:setUserData(DATA)
 	return DATA.ID
@@ -95,7 +103,7 @@ function env:newPlayer(pID,teamcolor)
 	env.playerek[pID]=PLAYER -- pID hez rendeli a szint
 end
 
-function env:newObj(pID,coords,szin,szoveg)
+function env:newObj(pID,coords,szin,fgv,usD)
 
 	if #coords<(2*3) or #coords>(2*8) then return end
 
@@ -104,12 +112,14 @@ function env:newObj(pID,coords,szin,szoveg)
 	local body = love.physics.newBody(self.world, x, y, "dynamic") -- test
 	local shape = createshape(x,y,coords)-- shape: a coords (0;0) pontja az x,y-on van
 	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
+	body:setAngularDamping(1) -- Forgás lassulása
+	body:setLinearDamping(0.1) -- Lassulás
 
-	return DatA(pID,fixture,szin,szoveg)
+	return DatA(pID,fixture,szin,fgv,usD)
 	
 end
 
-function env:addObj(pID,ID,coords,szin,szoveg)
+function env:addObj(pID,ID,coords,szin,fgv,usD,x,y)
 
 	if #coords<(2*3) or #coords>(2*8) then return end
 
@@ -118,7 +128,7 @@ function env:addObj(pID,ID,coords,szin,szoveg)
 	local shape = love.physics.newPolygonShape(unpack(coords)) 
 	local fixture = love.physics.newFixture(body,shape) -- shape testhezkapcsolás
 
-	return DatA(pID,fixture,szin,szoveg)
+	return DatA(pID,fixture,szin,fgv,usD,x,y)
 end
 
 --func
@@ -132,7 +142,7 @@ function env:removeObj(ID)
 		else
 			fixture:destroy()
 		end
-	else
+	else -- teljes törlés ha nincs paraméter
 		for i=1, env.IDs do
 			local fixture = env:getObj(i)
 			if fixture~=nil then fixture:getBody():destroy() end
@@ -189,11 +199,12 @@ function env:draw()
 				love.graphics.polygon("fill",points)
 				love.graphics.setColor(env.playerek[DATA.pID].teamcolor.rr,env.playerek[DATA.pID].teamcolor.gg,env.playerek[DATA.pID].teamcolor.bb,255)
 				love.graphics.polygon("line",points)
+
 				if DEBUG then 
 					love.graphics.setColor(255,255,255,255)
-					love.graphics.print(DATA.ID,points[1],points[2]) 
+					love.graphics.print(DATA.ID,kx,ky) 
 					local x,y = body:getPosition()
-					love.graphics.line(x,y,points[1],points[2])
+					love.graphics.line(x,y,kx,ky)
 				end
 			elseif (shapeType == "edge") then
 				love.graphics.setColor(0,0,0,255)
@@ -213,6 +224,9 @@ function env:draw()
 
 				love.graphics.print(DATA.szoveg,x-(w/2),y-(h/2))
 			end
+
+			if DATA.usD and DATA.fgv then DATA.fgv(fixture,body,shape,DATA) end-- block update
+
 		end
 		if DEBUG then
 			love.graphics.setColor(255,255,255,255)
