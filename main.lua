@@ -62,7 +62,7 @@ function exf.run(file, ...)
 	--menu felszab
 	menu:set()
 
-	love.load()
+	love.load(...)
 end
 
 function exf.empty() end
@@ -136,15 +136,14 @@ function menupontkattintas(id)
 		end
 
 	elseif menu:get()=="ujjatek" then
-		if id==1 then exf.run("Yasumihar.lua")
+		if id==1 then exf.run("game.lua","single")
 		elseif id==2 then menu:set("multi")
 		elseif id==3 then menu:set("fo")
 		end
 	elseif menu:get()=="multi" then
-		if id==1 then
-		elseif id==2 then 
-		elseif id==3 then
-			menu:set("ujjatek")
+		if id==1 then exf.run("game.lua","server")
+		elseif id==2 then exf.run("game.lua","client")
+		elseif id==3 then menu:set("ujjatek")
 		end
 	elseif menu:get()=="beall" then
 		if id==1 then

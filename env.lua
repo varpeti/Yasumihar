@@ -201,6 +201,7 @@ function env:draw()
 				love.graphics.polygon("line",points)
 
 				if DEBUG then 
+					local kx,ky = body:getWorldPoints(DATA.kx,DATA.ky)
 					love.graphics.setColor(255,255,255,255)
 					love.graphics.print(DATA.ID,kx,ky) 
 					local x,y = body:getPosition()
@@ -244,7 +245,7 @@ end
 --Ütközések
 
 function beginContact(a, b, coll)
-	kiir:new("Ütközés: A: "..table.concat({a:getBody():getPosition()},"	").."		B: "..table.concat({b:getBody():getPosition()},"	"),10)
+	--kiir:new("Ütközés: A: "..table.concat({a:getBody():getPosition()},"	").."		B: "..table.concat({b:getBody():getPosition()},"	"),10)
 end
 
 function endContact(a, b, coll)
