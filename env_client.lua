@@ -178,9 +178,8 @@ end
 
 -- draw, update
 
-function env:draw()
-	for b,body in ipairs(env.world:getBodyList()) do
-		for f,fixture in ipairs(body:getFixtureList()) do
+function env:draw(fixture)
+	        local body = fixture:getBody()
 			local shape = fixture:getShape()
 			local shapeType = shape:getType()
 			local DATA = fixture:getUserData()
@@ -227,13 +226,11 @@ function env:draw()
 
 			if DATA.usD and DATA.fgv then DATA.fgv(fixture,body,shape,DATA) end-- block update
 
-		end
 		if DEBUG then
 			love.graphics.setColor(255,255,255,255)
 			local x,y = body:getPosition()
 			love.graphics.circle("fill",x,y,5,15)
-		end
-	end		
+		end	
 end
 
 function env:update(dt)

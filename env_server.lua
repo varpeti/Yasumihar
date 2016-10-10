@@ -7,26 +7,6 @@ env.IDs = 0 -- számláló
 
 env.playerek = {}
 
---[[
-	DATA T
-		ID
-		pID
-		szin T
-			rr
-			gg
-			bb
-		img
-		szoveg
-		fgv
-
-	-------------
-	PLAYER T (pID indexel)
-		teamcolor
-			rr
-			gg
-			bb
-]]
-
 --------
 --Local
 --------
@@ -76,7 +56,8 @@ local function DatA(pID,fixture,szin,fgv,usD,x,y)
 		DATA.ky = y
 
 		DATA.pID = pID
-	fixture:setUserData(DATA)
+	fixture:setUserData(DATA) -- az objektumban elhelyezi az adatokat
+	table.insert(env.playerek[pID].mitlat,{ID=DATA.ID,ido=-1}) -- láthatóvá teszi a játékos számára
 	return DATA.ID
 end
 
@@ -99,7 +80,8 @@ function env:newPlayer(pID,teamcolor)
 			teamcolor.bb = math.random(122,255)
 		end
 		PLAYER.teamcolor = teamcolor
-	env.playerek[pID]=PLAYER -- pID hez rendeli a szint
+		PLAYER.mitlat = {}
+	env.playerek[pID]=PLAYER -- pID hez rendeli a szint, és a látható objektumok listáját
 end
 
 function env:newObj(pID,coords,szin,fgv,usD)
@@ -178,62 +160,12 @@ end
 
 -- draw, update
 
-function env:draw()
-	for b,body in ipairs(env.world:getBodyList()) do
-		for f,fixture in ipairs(body:getFixtureList()) do
-			local shape = fixture:getShape()
-			local shapeType = shape:getType()
-			local DATA = fixture:getUserData()
-	
-			if (shapeType == "circle") then
-				local x,y = body:getWorldPoint(shape:getPoint())
-				local radius = shape:getRadius()
-				love.graphics.setColor(DATA.szin.rr,DATA.szin.gg,DATA.szin.bb,255)
-				love.graphics.circle("fill",x,y,radius,15)
-				love.graphics.setColor(env.playerek[DATA.pID].teamcolor.rr,env.playerek[DATA.pID].teamcolor.gg,env.playerek[DATA.pID].teamcolor.bb,255)
-				love.graphics.circle("line",x,y,radius,15)
-			elseif (shapeType == "polygon") then
-				local points = {body:getWorldPoints(shape:getPoints())}
-				love.graphics.setColor(DATA.szin.rr,DATA.szin.gg,DATA.szin.bb,122)
-				love.graphics.polygon("fill",points)
-				love.graphics.setColor(env.playerek[DATA.pID].teamcolor.rr,env.playerek[DATA.pID].teamcolor.gg,env.playerek[DATA.pID].teamcolor.bb,255)
-				love.graphics.polygon("line",points)
-
-				if DEBUG then 
-					local kx,ky = body:getWorldPoints(DATA.kx,DATA.ky)
-					love.graphics.setColor(255,255,255,255)
-					love.graphics.print(DATA.ID,kx,ky) 
-					local x,y = body:getPosition()
-					love.graphics.line(x,y,kx,ky)
-				end
-			elseif (shapeType == "edge") then
-				love.graphics.setColor(0,0,0,255)
-				love.graphics.line(body:getWorldPoint(shape:getPoint()))
-			elseif (shapeType == "chain") then
-				love.graphics.setColor(0,0,0,255)
-				love.graphics.line(body:getWorldPoint(shape:getPoint()))
-			end
-			if DATA.szoveg~=nil then
-
-				love.graphics.setFont(fmenu);
-				love.graphics.setColor(255,255,255,255)
-
-				local x,y = body:getPosition()
-				local font = love.graphics.getFont()
-				local w,h = font:getWidth(DATA.szoveg), font:getHeight()
-
-				love.graphics.print(DATA.szoveg,x-(w/2),y-(h/2))
-			end
-
-			if DATA.usD and DATA.fgv then DATA.fgv(fixture,body,shape,DATA) end-- block update
-
-		end
-		if DEBUG then
-			love.graphics.setColor(255,255,255,255)
-			local x,y = body:getPosition()
-			love.graphics.circle("fill",x,y,5,15)
-		end
-	end		
+function env:draw(pID)
+	local lathatok = {}
+	for i,v in ipairs(env.playerek[pID].mitlat) do
+		table.insert(lathatok,{fix=env.getObj(v.ID),ido=v.ido})
+	end
+	return ser(lathatok) 
 end
 
 function env:update(dt)

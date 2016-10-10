@@ -1,4 +1,8 @@
 require "enet"
+envC = require('env_client')
+kamera = require('kamera')
+kiir = require('kiir')
+kepernyo = require('kepernyo')
 
 local client = {}
 
@@ -82,9 +86,9 @@ function client:update(dt)
 			if t[1]=="ciet3h4jo" then player.id=tonumber(t[2])
 			elseif t[1]=="fruej3f4t" then
 				table.insert(client.nextdraw,loadstring(t[2])())
-			elseif t[1]=="ciet3h4jo" then
-			elseif t[1]=="ciet3h4jo" then
-			elseif t[1]=="ciet3h4jo" then
+			--elseif t[1]=="ciet3h4jo" then
+			--elseif t[1]=="ciet3h4jo" then
+			--elseif t[1]=="ciet3h4jo" then
 			end
 		elseif event.type == "connect" then
 			kiir:new("Connected")
@@ -105,20 +109,9 @@ function client:draw()
 	kamera:set()
 		
 		if client.nextdraw[1] then
-			for b,FF in ipairs(client.nextdraw[1]) do
-				for f,t in ipairs(FF) do
-					love.graphics.setColor(t[1],t[2],t[3],t[4])
-					love.graphics.polygon("fill",t[5])
-					love.graphics.setColor(t[6],t[7],t[8],t[9])
-					love.graphics.polygon("line",t[5])
-					local debug = t[10]
-					if DEBUG and debug then
-						love.graphics.setColor(255,255,255,255)
-						love.graphics.print(debug[1],debug[2],debug[3]) 
-						love.graphics.line(debug[4],debug[5],debug[2],debug[3])
-						--print(debug[1],debug[2],debug[3],debug[4],debug[5])
-					end
-				end
+			for l,lathato in ipairs(client.nextdraw[1]) do
+				print(lathato.fix)
+				envC:draw(lathato.fix)
 			end
 			if #client.nextdraw>1 then table.remove(client.nextdraw,1) end
 		end

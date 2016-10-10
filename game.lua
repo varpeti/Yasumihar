@@ -1,18 +1,13 @@
 local game = {}
 
-env = require('env')
+player = require('player') -- sűrgősen javítani kell, az egész input rendszert!!!!
 
 function cl()
-	kamera = require('kamera')
-	kiir = require('kiir')
-	kepernyo = require('kepernyo')
-	player = require('player')
 	client = require('client')
 	client:init()
 end
 
 function se()
-	require('fa')
 	server = require('server')
 	server:init()
 end
