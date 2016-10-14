@@ -1,6 +1,5 @@
 require "enet"
 ser = require ('ser')
-env = require('env_server')
 require('fa')
 
 server = {}
@@ -32,7 +31,7 @@ function server:update(dt)
 		if event.type == "receive" then
 			--print("Got message: "..event.data,event.peer:connect_id())
 			if event.data=="zt4e2r3st?" then
-				event.peer:send("fruej3f4t?"..env:draw(event.peer:connect_id()))
+				event.peer:send("fruej3f4t?"..env:draw(1,event.peer:connect_id()))
 			end 
 			elseif event.type == "connect" then
 			--print("Connected: "..event.peer:connect_id())

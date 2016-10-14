@@ -1,5 +1,4 @@
 require "enet"
-envC = require('env_client')
 kamera = require('kamera')
 kiir = require('kiir')
 kepernyo = require('kepernyo')
@@ -112,7 +111,7 @@ function client:draw()
 			for l,lathato in ipairs(client.nextdraw[1]) do
 				for o,obj in ipairs(lathato) do
 					--print(obj[2].ID)
-					envC:draw(obj[1],obj[2],obj[3])
+					env:draw(2,obj)
 				end
 				
 			end
