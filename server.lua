@@ -38,6 +38,7 @@ function server:update(dt)
 			--print("Connected: "..event.peer:connect_id())
 			env:newPlayer(event.peer:connect_id())
 			event.peer:send("ciet3h4jo?"..facreate(event.peer:connect_id(),-700,-700))
+			env:getObj(env.IDs-1):getBody():setAngularVelocity(-1)
 		elseif event.type == "disconnect" then
 			--print(event.peer:connect_id() .. " disconnected.")
 		end

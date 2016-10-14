@@ -85,7 +85,7 @@ function client:update(dt)
 			local t = explode("?",event.data)
 			if t[1]=="ciet3h4jo" then player.id=tonumber(t[2])
 			elseif t[1]=="fruej3f4t" then
-				table.insert(client.nextdraw,loadstring(t[2])())
+				table.insert(client.nextdraw,{loadstring(t[2])()})
 			--elseif t[1]=="ciet3h4jo" then
 			--elseif t[1]=="ciet3h4jo" then
 			--elseif t[1]=="ciet3h4jo" then
@@ -110,8 +110,11 @@ function client:draw()
 		
 		if client.nextdraw[1] then
 			for l,lathato in ipairs(client.nextdraw[1]) do
-				print(lathato.fix)
-				envC:draw(lathato.fix)
+				for o,obj in ipairs(lathato) do
+					--print(obj[2].ID)
+					envC:draw(obj[1],obj[2],obj[3])
+				end
+				
 			end
 			if #client.nextdraw>1 then table.remove(client.nextdraw,1) end
 		end

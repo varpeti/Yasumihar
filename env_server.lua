@@ -57,7 +57,7 @@ local function DatA(pID,fixture,szin,fgv,usD,x,y)
 
 		DATA.pID = pID
 	fixture:setUserData(DATA) -- az objektumban elhelyezi az adatokat
-	table.insert(env.playerek[pID].mitlat,{ID=DATA.ID,ido=-1}) -- láthatóvá teszi a játékos számára
+	table.insert(env.playerek[pID].mitlat,{fixture=fixture,ido=-1}) -- láthatóvá teszi a játékos számára
 	return DATA.ID
 end
 
@@ -161,11 +161,13 @@ end
 -- draw, update
 
 function env:draw(pID)
-	local lathatok = {}
+	local t = {}
 	for i,v in ipairs(env.playerek[pID].mitlat) do
-		table.insert(lathatok,{fix=env.getObj(v.ID),ido=v.ido})
+		local DATA = v.fixture:getUserData()
+		local points = {v.fixture:getBody():getWorldPoints(v.fixture:getShape():getPoints())}
+		table.insert(t,{points,DATA,env.playerek[pID].teamcolor,v.time})
 	end
-	return ser(lathatok) 
+	return ser(t)
 end
 
 function env:update(dt)
