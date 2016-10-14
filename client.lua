@@ -28,9 +28,9 @@ end
 function client:init()
 	--Cliens beállításai
 	client.host = enet.host_create()
-	local file = io.open("port","r")
-	client.server = client.host:connect("localhost:"..file:read("*all"))
-	file:close()
+	local file = "port"
+	if not love.filesystem.exists(file) then error([[Hiányzik a "]]..file..[[" file]]) end
+	client.server = client.host:connect("localhost:"..love.filesystem.read(file))
 
 	--ablak beállítások
 	kepernyo:setmode(1280,720,0,true,2,1)
