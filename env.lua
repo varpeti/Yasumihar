@@ -160,6 +160,7 @@ end
 --get
 
 function env:getObj(ID)
+	if ID==nil then error("aaa") end
 	for b,body in ipairs(env.world:getBodyList()) do
 		for f,fixture in ipairs(body:getFixtureList()) do
 			if ID == fixture:getUserData().ID then return fixture end

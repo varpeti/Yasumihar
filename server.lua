@@ -1,15 +1,19 @@
-require "enet"
 ser = require ('ser')
 require('fa')
 
-server = {}
+local server = {}
 
-
-function server:init()
-	--szerver beállítása
+function hostinit()
 	local file = "port"
 	if not love.filesystem.exists(file) then error([[Hiányzik a "]]..file..[[" file]]) end
 	server.host = enet.host_create("*:"..love.filesystem.read(file)) 
+end
+
+
+function server:init()
+
+	--szerver beállítása
+	hostinit()
 
 	--env beállításai
 	env:setCallbacks()

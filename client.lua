@@ -1,4 +1,3 @@
-require "enet"
 kamera = require('kamera')
 kiir = require('kiir')
 kepernyo = require('kepernyo')
@@ -104,13 +103,12 @@ end
 
 function client:draw()
 
-	kamera:aPos(player.x,player.y) --kamera beállítása: player közepe - képernyő méret fele * nagyitás
+	kamera:aPos(player.x,player.y) --kamera beállítása: player közepe 
 	kamera:set()
 		
-		if client.nextdraw[1] then
+		if client.nextdraw[1] then -- kirajzolja a legrégebben beérkezett csomag tartalát
 			for l,lathato in ipairs(client.nextdraw[1]) do
 				for o,obj in ipairs(lathato) do
-					--print(obj[2].ID)
 					env:draw(2,obj)
 				end
 				

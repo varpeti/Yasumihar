@@ -40,8 +40,8 @@ end
 
 function player.keypressed(key)
 	if key == "escape" then
-		--love.event.quit()
-		env:removeObj()
+		love.event.quit()
+		--env:removeObj()
 	end
 	if key == "menu" or key=="space" then
 		if kameralock then kameralock=false else kameralock=true end
@@ -92,9 +92,11 @@ function player.mousepressed(x,y,id,button)
 			end
 		end
 	elseif button==2 then
+		kiir:new(player.kijelol)
 		if player.kijelol~=-1 then
 			local szog = 0
 			local fixture = env:getObj(player.kijelol)
+			print(player.kijelol)
 			if fixture~=nil then 
 				local body = fixture:getBody()
 				local DATA = fixture:getUserData()
