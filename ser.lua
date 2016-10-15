@@ -38,6 +38,7 @@ local function write(t, memo, rev_memo)
         end
         return '_[' .. memo[t] .. ']'
     else
+        print(ty)
         error("Trying to serialize unsupported type " .. ty)
     end
 end

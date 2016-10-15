@@ -1,8 +1,10 @@
+require "enet"
 kamera = require('kamera')
 kiir = require('kiir')
 kepernyo = require('kepernyo')
 
 local client = {}
+client.objs = {}
 
 local function explode(d,p)
   local t, ll
@@ -39,7 +41,6 @@ function client:init()
 	kameralock = false
 	DEBUG = false
 	fullsreen = false
-	client.nextdraw = {}
 
 	--kiírási beállítások
 	fmenu = love.graphics.newFont(48)
@@ -82,9 +83,21 @@ function client:update(dt)
 			--kiir:new("Got message: "..event.data.." "..event.peer:connect_id())
 			local t = explode("?",event.data)
 			if t[1]=="ciet3h4jo" then player.id=tonumber(t[2])
-			elseif t[1]=="fruej3f4t" then
-				table.insert(client.nextdraw,{loadstring(t[2])()})
-			--elseif t[1]=="ciet3h4jo" then
+			elseif t[1]=="fruej3f4t" then -- szervertől kapott új blokkok
+
+				local objs = loadstring(t[2])()
+				for o,obj in ipairs(objs) do
+					client.objs[obj[2].ID] = {points=obj[1],DATA=obj[2],teamcolor=obj[3]}
+				end
+
+			elseif t[1]=="akh8734tg" then -- a szervertől kapott elmozdulások.
+
+				local objs = loadstring(t[2])()
+				for o,obj in ipairs(objs) do
+					--local points,ID = obj[1], obj[2]
+					client.objs[obj[2]].points = obj[1] -- pozíciót adja át
+				end
+
 			--elseif t[1]=="ciet3h4jo" then
 			--elseif t[1]=="ciet3h4jo" then
 			end
@@ -102,18 +115,14 @@ function client:update(dt)
 end
 
 function client:draw()
-
-	kamera:aPos(player.x,player.y) --kamera beállítása: player közepe 
+	kamera:aPos(player.x,player.y) --kamera beállítása: player közepe - képernyő méret fele * nagyitás
 	kamera:set()
 		
-		if client.nextdraw[1] then -- kirajzolja a legrégebben beérkezett csomag tartalát
-			for l,lathato in ipairs(client.nextdraw[1]) do
-				for o,obj in ipairs(lathato) do
-					env:draw(2,obj)
-				end
-				
-			end
-			if #client.nextdraw>1 then table.remove(client.nextdraw,1) end
+		for o,obj in pairs(client.objs) do
+			love.graphics.setColor(obj.DATA.szin.rr,obj.DATA.szin.gg,obj.DATA.szin.bb,122)
+			love.graphics.polygon("fill",obj.points)
+			love.graphics.setColor(obj.teamcolor.rr,obj.teamcolor.gg,obj.teamcolor.bb,255)
+			love.graphics.polygon("line",obj.points)
 		end
 	
 		local mx,my = kamera:worldCoords(love.mouse:getX()-(kepernyo.Asz/2),love.mouse:getY()-(kepernyo.Am/2))
@@ -122,7 +131,7 @@ function client:draw()
 	kamera:unset()
 	
 	love.graphics.setColor(255,255,255,255)
-	love.graphics.setFont(fkicsi);
+	love.graphics.setFont(fkicsi)
 
 	if DEBUG then
 		love.graphics.print(player.x.."       "..player.y.."\n"..mx.."      "..my.."\n"..player.kijelol.." kijelolve",10,10)
@@ -135,8 +144,6 @@ function client:draw()
 
 	love.graphics.setFont(fkiiras);
 	kiir:draw(10,kepernyo.Am-25,true,DEBUG) --kiirasok
-
-	love.graphics.print(#client.nextdraw,100,100)
 
 end
 

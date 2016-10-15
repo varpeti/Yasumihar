@@ -1,19 +1,14 @@
-ser = require ('ser')
+require "enet"
 require('fa')
 
-local server = {}
-
-function hostinit()
-	local file = "port"
-	if not love.filesystem.exists(file) then error([[Hiányzik a "]]..file..[[" file]]) end
-	server.host = enet.host_create("*:"..love.filesystem.read(file)) 
-end
+server = {}
 
 
 function server:init()
-
 	--szerver beállítása
-	hostinit()
+	local file = "port"
+	if not love.filesystem.exists(file) then error([[Hiányzik a "]]..file..[[" file]]) end
+	server.host = enet.host_create("*:"..love.filesystem.read(file)) 
 
 	--env beállításai
 	env:setCallbacks()
@@ -34,13 +29,16 @@ function server:update(dt)
 	if event then 
 		if event.type == "receive" then
 			--print("Got message: "..event.data,event.peer:connect_id())
-			if event.data=="zt4e2r3st?" then
-				event.peer:send("fruej3f4t?"..env:draw(1,event.peer:connect_id()))
+			if event.data=="zt4e2r3st?" then --update kérés
+				local reobjs, ujobjs = env:getSerObj(event.peer:connect_id())
+				if ujobjs then event.peer:send("fruej3f4t?"..ujobjs) end -- új objektum
+				event.peer:send("akh8734tg?"..reobjs) -- elmozdulások
 			end 
 			elseif event.type == "connect" then
 			--print("Connected: "..event.peer:connect_id())
 			env:newPlayer(event.peer:connect_id())
 			event.peer:send("ciet3h4jo?"..facreate(event.peer:connect_id(),-700,-700))
+			env:getObj(env.IDs-1):getBody():setLinearVelocity(1000,1000)
 			env:getObj(env.IDs-1):getBody():setAngularVelocity(-1)
 		elseif event.type == "disconnect" then
 			--print(event.peer:connect_id() .. " disconnected.")

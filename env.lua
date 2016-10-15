@@ -1,3 +1,5 @@
+--local 
+ser = require ('ser')
 local env = {}
 
 love.physics.setMeter(10) --10 pixel = 1 méter
@@ -160,7 +162,6 @@ end
 --get
 
 function env:getObj(ID)
-	if ID==nil then error("aaa") end
 	for b,body in ipairs(env.world:getBodyList()) do
 		for f,fixture in ipairs(body:getFixtureList()) do
 			if ID == fixture:getUserData().ID then return fixture end
@@ -179,80 +180,78 @@ function env:getPlayerObjs(pID)
 	return ids
 end
 
+function env:getSerObj(pID)
+	local ujobjs = {}
+	local reobjs = {}
+	for i,v in ipairs(env.playerek[pID].mitlat) do
+		local points = {v.fixture:getBody():getWorldPoints(v.fixture:getShape():getPoints())}
+	 	if v.ido == -1 then
+	 		table.insert(ujobjs,{points,v.fixture:getUserData(),env.playerek[pID].teamcolor}) -- az User data tartalmazza az ID-t
+	 		v.ido=-2
+	 	elseif v.ido == -2 then
+	 		table.insert(reobjs,{points,v.fixture:getUserData().ID})
+	 	end
+	end 
+	if #ujobjs>0 then
+		return ser(reobjs), ser(ujobjs)
+	end
+	return ser(reobjs), nil
+end
+
 -- draw, update
 
-function env:draw(soloORserverOrclient,t)
-	if soloORserverOrclient == nil then
-		for b,body in ipairs(env.world:getBodyList()) do
-			for f,fixture in ipairs(body:getFixtureList()) do
-				local shape = fixture:getShape()
-				local shapeType = shape:getType()
-				local DATA = fixture:getUserData()
-		
-				if (shapeType == "circle") then
-					local x,y = body:getWorldPoint(shape:getPoint())
-					local radius = shape:getRadius()
-					love.graphics.setColor(DATA.szin.rr,DATA.szin.gg,DATA.szin.bb,255)
-					love.graphics.circle("fill",x,y,radius,15)
-					love.graphics.setColor(env.playerek[DATA.pID].teamcolor.rr,env.playerek[DATA.pID].teamcolor.gg,env.playerek[DATA.pID].teamcolor.bb,255)
-					love.graphics.circle("line",x,y,radius,15)
-				elseif (shapeType == "polygon") then
-					local points = {body:getWorldPoints(shape:getPoints())}
-					love.graphics.setColor(DATA.szin.rr,DATA.szin.gg,DATA.szin.bb,122)
-					love.graphics.polygon("fill",points)
-					love.graphics.setColor(env.playerek[DATA.pID].teamcolor.rr,env.playerek[DATA.pID].teamcolor.gg,env.playerek[DATA.pID].teamcolor.bb,255)
-					love.graphics.polygon("line",points)
+function env:draw()
+	for b,body in ipairs(env.world:getBodyList()) do
+		for f,fixture in ipairs(body:getFixtureList()) do
+			local shape = fixture:getShape()
+			local shapeType = shape:getType()
+			local DATA = fixture:getUserData()
 	
+			if (shapeType == "circle") then
+				local x,y = body:getWorldPoint(shape:getPoint())
+				local radius = shape:getRadius()
+				love.graphics.setColor(DATA.szin.rr,DATA.szin.gg,DATA.szin.bb,255)
+				love.graphics.circle("fill",x,y,radius,15)
+				love.graphics.setColor(env.playerek[DATA.pID].teamcolor.rr,env.playerek[DATA.pID].teamcolor.gg,env.playerek[DATA.pID].teamcolor.bb,255)
+				love.graphics.circle("line",x,y,radius,15)
+			elseif (shapeType == "polygon") then
+				local points = {body:getWorldPoints(shape:getPoints())}
+				love.graphics.setColor(DATA.szin.rr,DATA.szin.gg,DATA.szin.bb,122)
+				love.graphics.polygon("fill",points)
+				love.graphics.setColor(env.playerek[DATA.pID].teamcolor.rr,env.playerek[DATA.pID].teamcolor.gg,env.playerek[DATA.pID].teamcolor.bb,255)
+				love.graphics.polygon("line",points)
 					if DEBUG then 
-						local kx,ky = body:getWorldPoints(DATA.kx,DATA.ky)
-						love.graphics.setColor(255,255,255,255)
-						love.graphics.print(DATA.ID,kx,ky) 
-						local x,y = body:getPosition()
-						love.graphics.line(x,y,kx,ky)
-					end
-				elseif (shapeType == "edge") then
-					love.graphics.setColor(0,0,0,255)
-					love.graphics.line(body:getWorldPoint(shape:getPoint()))
-				elseif (shapeType == "chain") then
-					love.graphics.setColor(0,0,0,255)
-					love.graphics.line(body:getWorldPoint(shape:getPoint()))
-				end
-				if DATA.szoveg~=nil then
-	
-					love.graphics.setFont(fmenu);
+					local kx,ky = body:getWorldPoints(DATA.kx,DATA.ky)
 					love.graphics.setColor(255,255,255,255)
-	
+					love.graphics.print(DATA.ID,kx,ky) 
 					local x,y = body:getPosition()
-					local font = love.graphics.getFont()
-					local w,h = font:getWidth(DATA.szoveg), font:getHeight()
-	
-					love.graphics.print(DATA.szoveg,x-(w/2),y-(h/2))
+					love.graphics.line(x,y,kx,ky)
 				end
-	
-				if DATA.usD and DATA.fgv then DATA.fgv(fixture,body,shape,DATA) end-- block update
-	
+			elseif (shapeType == "edge") then
+				love.graphics.setColor(0,0,0,255)
+				love.graphics.line(body:getWorldPoint(shape:getPoint()))
+			elseif (shapeType == "chain") then
+				love.graphics.setColor(0,0,0,255)
+				love.graphics.line(body:getWorldPoint(shape:getPoint()))
 			end
-			if DEBUG then
+
+			if DATA.szoveg~=nil then
+				love.graphics.setFont(fmenu);
 				love.graphics.setColor(255,255,255,255)
 				local x,y = body:getPosition()
-				love.graphics.circle("fill",x,y,5,15)
+				local font = love.graphics.getFont()
+				local w,h = font:getWidth(DATA.szoveg), font:getHeight()
+				love.graphics.print(DATA.szoveg,x-(w/2),y-(h/2))
 			end
-		end	
-	elseif soloORserverOrclient == 2 then
 
-		local points,DATA,teamcolor = t[1], t[2], t[3]
-		love.graphics.setColor(DATA.szin.rr,DATA.szin.gg,DATA.szin.bb,122)
-		love.graphics.polygon("fill",points)
-		love.graphics.setColor(teamcolor.rr,teamcolor.gg,teamcolor.bb,255)
-		love.graphics.polygon("line",points)
-	elseif soloORserverOrclient == 1 then
-		local obj = {}
-		for i,v in ipairs(env.playerek[t].mitlat) do
-			local DATA = v.fixture:getUserData()
-			local points = {v.fixture:getBody():getWorldPoints(v.fixture:getShape():getPoints())}
-			table.insert(obj,{points,DATA,env.playerek[t].teamcolor,v.time})
+			if DATA.usD and DATA.fgv then DATA.fgv(fixture,body,shape,DATA) end-- block update
 		end
-		return ser(obj)
+
+		if DEBUG then
+			love.graphics.setColor(255,255,255,255)
+			local x,y = body:getPosition()
+			love.graphics.circle("fill",x,y,5,15)
+		end
 	end	
 end
 
