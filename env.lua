@@ -79,7 +79,7 @@ local function DatA(pID,fixture,szin,fgv,usD,x,y)
 
 		DATA.pID = pID
 	fixture:setUserData(DATA) -- az objektumban elhelyezi az adatokat
-	table.insert(env.playerek[pID].mitlat,{fixture=fixture,ido=-1}) -- láthatóvá teszi a játékos számára
+	table.insert(env.playerek[pID].mitlat,{fixture=fixture,ido=1}) -- láthatóvá teszi a játékos számára 1=örökre
 	return DATA.ID
 end
 
@@ -180,16 +180,23 @@ function env:getPlayerObjs(pID)
 	return ids
 end
 
-function env:getSerObj(pID)
+function env:getSerObj(pID) -- Viszadaja a régi és az új objektumok serilizált adatait
+	--print()
 	local ujobjs = {}
 	local reobjs = {}
 	for i,v in ipairs(env.playerek[pID].mitlat) do
+		--print(i,v.ido)
 		local points = {v.fixture:getBody():getWorldPoints(v.fixture:getShape():getPoints())}
-	 	if v.ido == -1 then
+	 	if v.ido>0 then -- ha új objektum lett látható, "v.ido"-ig látható | ha 1 akkor örökre
 	 		table.insert(ujobjs,{points,v.fixture:getUserData(),env.playerek[pID].teamcolor}) -- az User data tartalmazza az ID-t
-	 		v.ido=-2
-	 	elseif v.ido == -2 then
+	 		v.ido=-v.ido+1 -- negatívval számol, mert a pozitív az új objektumok ideje, 0-as lesz ami örökre látható, és nem új
+	 	else 	-- 0  és negatív számok = régi objektumok
 	 		table.insert(reobjs,{points,v.fixture:getUserData().ID})
+	 		if v.ido<-1 then -- egyig megy mert a 0-as örökre látható
+	 			v.ido=v.ido+1 -- Lekérdezésenként "csökken", lehet szerver tickenként jobb lenne
+	 		elseif v.ido~=0 then
+	 			table.remove(env.playerek[pID].mitlat,i)
+ 	 		end
 	 	end
 	end 
 	if #ujobjs>0 then
@@ -264,6 +271,10 @@ end
 
 function beginContact(a, b, coll)
 	--kiir:new("Ütközés: A: "..table.concat({a:getBody():getPosition()},"	").."		B: "..table.concat({b:getBody():getPosition()},"	"),10)
+	if a:getUserData().pID~=b:getUserData().pID then
+		table.insert(env.playerek[a:getUserData().pID].mitlat,{fixture=b,ido=255})
+		table.insert(env.playerek[b:getUserData().pID].mitlat,{fixture=a,ido=255})
+	end
 end
 
 function endContact(a, b, coll)
