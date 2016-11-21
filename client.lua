@@ -85,9 +85,9 @@ function client:update(dt)
 			if t[1]=="ciet3h4jo" then player.id=tonumber(t[2])
 			elseif t[1]=="fruej3f4t" then -- szervertől kapott új blokkok
 
-				local objs = loadstring(t[2])()
+				local objs = loadstring(t[2])() --objs = objektumok
 				for o,obj in ipairs(objs) do
-					client.objs[obj[2].ID] = {points=obj[1],DATA=obj[2],teamcolor=obj[3]}
+					client.objs[obj[2].ID] = {points=obj[1],DATA=obj[2],teamcolor=obj[3]} -- obj[1]=pontok | obj[2]=DATA | obj[3]=csapat szin
 				end
 
 			elseif t[1]=="akh8734tg" then -- a szervertől kapott elmozdulások.
