@@ -161,7 +161,7 @@ function env:getObj(ID)
 			if ID == fixture:getUserData().ID then return fixture end
 		end
 	end
-	return nil
+	return nil 
 end
 
 function env:getPlayerObjs(pID)
@@ -190,7 +190,7 @@ function env:getSerObj(pID) -- Viszadaja a régi és az új objektumok serilizá
 	 			v.ido=v.ido+1 -- Lekérdezésenként "csökken", lehet szerver tickenként vagy dt időnként jobb lenne
 	 		elseif v.ido~=-255 then
 	 			--print(v.fixture:getUserData().ID)
-	 			table.remove(env.playerek[pID].mitlat,i)
+	 			env.playerek[pID].mitlat[i]=nil
  	 		end
 	 	end
 	end 

@@ -98,7 +98,7 @@ function client:update(dt)
 					--local points,ID,time = obj[1], obj[2], obj[3]
 					client.objs[obj[2]].points = obj[1] -- pozíciót adja át
 					client.objs[obj[2]].time = obj[3] -- a látszódási időt / átlátszóságot adja át
-					if obj[3]==0 then table.remove(client.objs,obj[2]) end -- lejárt idejűek törlése
+					if obj[3]==0 then client.objs[obj[2]]=nil end -- lejárt idejűek törlése
 				end
 
 			--elseif t[1]=="ciet3h4jo" then
@@ -120,6 +120,8 @@ end
 function client:draw()
 	kamera:aPos(player.x,player.y) --kamera beállítása: player közepe - képernyő méret fele * nagyitás
 	kamera:set()
+
+	env:draw()
 		
 		for o,obj in pairs(client.objs) do
 			love.graphics.setColor(obj.DATA.szin.rr,obj.DATA.szin.gg,obj.DATA.szin.bb,math.floor(obj.time/2))
