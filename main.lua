@@ -79,7 +79,7 @@ end
 
 function lines_from(file)
 	if not love.filesystem.exists(file) then error([[Hiányzik a "]]..file..[[" file]]) end
-  	lines = {}
+  	local lines = {}
   	for line in love.filesystem.lines(file) do 
     	lines[#lines + 1] = line
   	end

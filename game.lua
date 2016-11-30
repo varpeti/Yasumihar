@@ -1,9 +1,5 @@
 local game = {}
 
-player = require('player') -- sűrgősen javítani kell, az egész input rendszert!!!!
-
-env = require('env')
-
 function cl()
 	client = require('client')
 	client:init()

@@ -74,7 +74,7 @@ function player.mousepressed(x,y,id,button)
 	if id==nil then 
 		t.id = button 
 	else
-		t.id=id
+		t.id = id
 	end
 	table.insert(player.tue,t)
 	if #player.tue==3 then player.keypressed("menu") end
@@ -92,23 +92,7 @@ function player.mousepressed(x,y,id,button)
 			end
 		end
 	elseif button==2 then
-		if player.kijelol~=-1 then
-			local szog = 0
-			local fixture = env:getObj(player.kijelol)
-			if fixture~=nil then 
-				local body = fixture:getBody()
-				local DATA = fixture:getUserData()
-				local sx,sy = body:getWorldPoints(DATA.kx,DATA.ky)
-				sx = x-sx
-				sy = y-sy
-				if sx<0 then 
-					szog = 3.141592653589793238462643383279+math.atan(sy/sx)
-				else
-					szog = math.atan(sy/sx)
-				end
-				fixture:getUserData().usD={szog=szog-body:getAngle(),ero=159999,megy=true}
-			end
-		end
+		
 	elseif button==3 then
 		facreate("Gaia",x,y)
 	end
@@ -144,25 +128,6 @@ end
 
 function player.mousereleased(x,y,id,button)
 	table.remove(player.tue,#player.tue)
-end
-
-function player.fgv(fixture,body,shape,DATA)
-
-	-- UPDATE
-	if DATA.usD.megy then
-		DATA.usD.ero = DATA.usD.ero or 20000
-		if fixture==nil then return end
-		local kx, ky = body:getWorldPoints(DATA.kx,DATA.ky)
-		body:applyForce(DATA.usD.ero*math.cos(DATA.usD.szog+body:getAngle()),DATA.usD.ero*math.sin(DATA.usD.szog+body:getAngle()),kx,ky)
-	end
-
-	--DRAW
-
-	love.graphics.setColor(255,255,000,255)
-	local kx, ky = body:getWorldPoints(DATA.kx,DATA.ky)
-	if DATA.usD then 
-		love.graphics.line(200*math.cos(DATA.usD.szog+body:getAngle())+kx,200*math.sin(DATA.usD.szog+body:getAngle())+ky,kx,ky)
-	end
 end
 
 return player

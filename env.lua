@@ -18,8 +18,6 @@ env.playerek = {}
 			gg
 			bb
 		img
-		szoveg
-		fgv
 
 	-------------
 	PLAYER T (pID indexel)
@@ -54,7 +52,7 @@ local function CoM(coords)
 	return maxx/o, maxy/o -- A tömeg középpont
 end
 
-local function DatA(pID,fixture,szin,fgv,usD,x,y)
+local function DatA(pID,fixture,szin)
 
 	local DATA = {}
 		env.IDs = env.IDs+1 -- növelem a számlálót
@@ -71,15 +69,11 @@ local function DatA(pID,fixture,szin,fgv,usD,x,y)
 			DATA.szin.bb = math.random(122,255)
 		end
 
-		DATA.fgv = fgv
-		DATA.usD = usD
-
-		DATA.kx = x
-		DATA.ky = y
+		DATA.img = nil
 
 		DATA.pID = pID
 	fixture:setUserData(DATA) -- az objektumban elhelyezi az adatokat
-	table.insert(env.playerek[pID].mitlat,{fixture=fixture,ido=1}) -- láthatóvá teszi a játékos számára 1=örökre
+	env.playerek[pID].mitlat[DATA.ID]={fixture=fixture,ido=255} -- láthatóvá teszi a játékos számára 255=örökre
 	return DATA.ID
 end
 
@@ -106,7 +100,7 @@ function env:newPlayer(pID,teamcolor)
 	env.playerek[pID]=PLAYER -- pID hez rendeli a szint, és a látható objektumok listáját
 end
 
-function env:newObj(pID,coords,szin,fgv,usD)
+function env:newObj(pID,coords,szin)
 
 	if #coords<(2*3) or #coords>(2*8) then return end
 
@@ -118,7 +112,7 @@ function env:newObj(pID,coords,szin,fgv,usD)
 	body:setAngularDamping(1) -- Forgás lassulása
 	body:setLinearDamping(0.1) -- Lassulás
 
-	return DatA(pID,fixture,szin,fgv,usD)
+	return DatA(pID,fixture,szin)
 	
 end
 
@@ -184,17 +178,18 @@ function env:getSerObj(pID) -- Viszadaja a régi és az új objektumok serilizá
 	--print()
 	local ujobjs = {}
 	local reobjs = {}
-	for i,v in ipairs(env.playerek[pID].mitlat) do
+	for i,v in pairs(env.playerek[pID].mitlat) do
 		--print(i,v.ido)
 		local points = {v.fixture:getBody():getWorldPoints(v.fixture:getShape():getPoints())}
-	 	if v.ido>0 then -- ha új objektum lett látható, "v.ido"-ig látható | ha 1 akkor örökre
+	 	if v.ido>0 then -- ha új objektum lett látható, "v.ido"-ig látható | ha 255 akkor örökre
 	 		table.insert(ujobjs,{points,v.fixture:getUserData(),env.playerek[pID].teamcolor}) -- az User data tartalmazza az ID-t
-	 		v.ido=-v.ido+1 -- negatívval számol, mert a pozitív az új objektumok ideje, 0-as lesz ami örökre látható, és nem új
+	 		v.ido=-v.ido -- negatívval számol, mert a pozitív az új objektumok ideje
 	 	else 	-- 0  és negatív számok = régi objektumok
-	 		table.insert(reobjs,{points,v.fixture:getUserData().ID})
-	 		if v.ido<-1 then -- egyig megy mert a 0-as örökre látható
-	 			v.ido=v.ido+1 -- Lekérdezésenként "csökken", lehet szerver tickenként jobb lenne
-	 		elseif v.ido~=0 then
+	 		table.insert(reobjs,{points,v.fixture:getUserData().ID,-v.ido})
+	 		if v.ido~=-1 and v.ido~=-255 then
+	 			v.ido=v.ido+1 -- Lekérdezésenként "csökken", lehet szerver tickenként vagy dt időnként jobb lenne
+	 		elseif v.ido~=-255 then
+	 			--print(v.fixture:getUserData().ID)
 	 			table.remove(env.playerek[pID].mitlat,i)
  	 		end
 	 	end
@@ -242,16 +237,6 @@ function env:draw()
 				love.graphics.line(body:getWorldPoint(shape:getPoint()))
 			end
 
-			if DATA.szoveg~=nil then
-				love.graphics.setFont(fmenu);
-				love.graphics.setColor(255,255,255,255)
-				local x,y = body:getPosition()
-				local font = love.graphics.getFont()
-				local w,h = font:getWidth(DATA.szoveg), font:getHeight()
-				love.graphics.print(DATA.szoveg,x-(w/2),y-(h/2))
-			end
-
-			if DATA.usD and DATA.fgv then DATA.fgv(fixture,body,shape,DATA) end-- block update
 		end
 
 		if DEBUG then
@@ -271,9 +256,11 @@ end
 
 function beginContact(a, b, coll)
 	--kiir:new("Ütközés: A: "..table.concat({a:getBody():getPosition()},"	").."		B: "..table.concat({b:getBody():getPosition()},"	"),10)
-	if a:getUserData().pID~=b:getUserData().pID then
-		table.insert(env.playerek[a:getUserData().pID].mitlat,{fixture=b,ido=255})
-		table.insert(env.playerek[b:getUserData().pID].mitlat,{fixture=a,ido=255})
+	local aUserData = a:getUserData()
+	local bUserData = b:getUserData()
+	if aUserData.pID ~= bUserData.pID then
+		env.playerek[aUserData.pID].mitlat[bUserData.ID]={fixture=b,ido=254}
+		env.playerek[bUserData.pID].mitlat[aUserData.ID]={fixture=a,ido=254}
 	end
 end
 

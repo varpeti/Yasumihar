@@ -1,5 +1,6 @@
 require "enet"
 require('fa')
+env = require('env')
 
 server = {}
 
@@ -21,6 +22,7 @@ function server:init()
 		
 	env:newObj("Gaia",{-50,-50,-30,50,40,40})
     env:newObj("Gaia",{200,200,150,170,180,110,135,167,123,110})
+    env:getObj(2):getBody():setAngularVelocity(-1)
 
 end
 
@@ -35,11 +37,11 @@ function server:update(dt)
 				event.peer:send("akh8734tg?"..reobjs) -- elmozdulások
 			end 
 			elseif event.type == "connect" then
-			--print("Connected: "..event.peer:connect_id())
-			env:newPlayer(event.peer:connect_id())
-			event.peer:send("ciet3h4jo?"..facreate(event.peer:connect_id(),-700,-700))
-			env:getObj(env.IDs-1):getBody():setLinearVelocity(1000,1000)
-			env:getObj(env.IDs-1):getBody():setAngularVelocity(-1)
+				--print("Connected: "..event.peer:connect_id())
+				env:newPlayer(event.peer:connect_id())
+				event.peer:send("ciet3h4jo?"..facreate(event.peer:connect_id(),-700,-700))
+				env:getObj(env.IDs-1):getBody():setLinearVelocity(500,500)
+				env:getObj(env.IDs-1):getBody():setAngularVelocity(-1)
 		elseif event.type == "disconnect" then
 			--print(event.peer:connect_id() .. " disconnected.")
 		end

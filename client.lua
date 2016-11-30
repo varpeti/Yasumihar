@@ -2,6 +2,7 @@ require "enet"
 kamera = require('kamera')
 kiir = require('kiir')
 kepernyo = require('kepernyo')
+player = require('player') -- sűrgősen javítani kell, az egész input rendszert!!!!
 
 local client = {}
 client.objs = {}
@@ -83,19 +84,21 @@ function client:update(dt)
 			--kiir:new("Got message: "..event.data.." "..event.peer:connect_id())
 			local t = explode("?",event.data)
 			if t[1]=="ciet3h4jo" then player.id=tonumber(t[2])
-			elseif t[1]=="fruej3f4t" then -- szervertől kapott új blokkok
+			elseif t[1]=="fruej3f4t" then -- szervertől kapott új blokkok | ha nem kapja meg bugolni fog :/
 
 				local objs = loadstring(t[2])() --objs = objektumok
 				for o,obj in ipairs(objs) do
-					client.objs[obj[2].ID] = {points=obj[1],DATA=obj[2],teamcolor=obj[3]} -- obj[1]=pontok | obj[2]=DATA | obj[3]=csapat szin
+					client.objs[obj[2].ID] = {points=obj[1],DATA=obj[2],teamcolor=obj[3],time=255} -- obj[1]=pontok | obj[2]=DATA | obj[3]=csapat szin
 				end
 
 			elseif t[1]=="akh8734tg" then -- a szervertől kapott elmozdulások.
 
 				local objs = loadstring(t[2])()
 				for o,obj in ipairs(objs) do
-					--local points,ID = obj[1], obj[2]
+					--local points,ID,time = obj[1], obj[2], obj[3]
 					client.objs[obj[2]].points = obj[1] -- pozíciót adja át
+					client.objs[obj[2]].time = obj[3] -- a látszódási időt / átlátszóságot adja át
+					if obj[3]==0 then table.remove(client.objs,obj[2]) end -- lejárt idejűek törlése
 				end
 
 			--elseif t[1]=="ciet3h4jo" then
@@ -119,9 +122,9 @@ function client:draw()
 	kamera:set()
 		
 		for o,obj in pairs(client.objs) do
-			love.graphics.setColor(obj.DATA.szin.rr,obj.DATA.szin.gg,obj.DATA.szin.bb,122)
+			love.graphics.setColor(obj.DATA.szin.rr,obj.DATA.szin.gg,obj.DATA.szin.bb,math.floor(obj.time/2))
 			love.graphics.polygon("fill",obj.points)
-			love.graphics.setColor(obj.teamcolor.rr,obj.teamcolor.gg,obj.teamcolor.bb,255)
+			love.graphics.setColor(obj.teamcolor.rr,obj.teamcolor.gg,obj.teamcolor.bb,obj.time)
 			love.graphics.polygon("line",obj.points)
 		end
 	
@@ -136,8 +139,18 @@ function client:draw()
 	if DEBUG then
 		love.graphics.print(player.x.."       "..player.y.."\n"..mx.."      "..my.."\n"..player.kijelol.." kijelolve",10,10)
 		local text = ""
-		for k,v in pairs(_G) do
+		--[[for k,v in pairs(_G) do
 			if type(v)~="function" then text = text..k..": "..type(v).."\n" end
+		end]]
+		local ignore = {"coroutine","io","arg","love","jit","bit","package","debug","table","_VERSION","math","text","os","_G","string"}
+		for k,v in pairs(_G) do
+			if type(v)~="function" then 
+				local b = true
+				for a,s in ipairs(ignore) do
+					if s==k then b = false end 
+				end  
+				if b then text = text..k..": "..type(v).."\n" end
+			end
 		end
 		love.graphics.print(text,500,10)
 	end
