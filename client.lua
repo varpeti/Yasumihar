@@ -7,22 +7,9 @@ player = require('player') -- sűrgősen javítani kell, az egész input rendsze
 local client = {}
 client.objs = {}
 
-local function explode(d,p)
-  local t, ll
-  t={}
-  ll=0
-  if(#p == 1) then return {p} end
-    while true do
-      l=string.find(p,d,ll,true) -- find the next d in the string
-      if l~=nil then -- if "not not" found then..
-        table.insert(t, string.sub(p,ll,l-1)) -- Save it in our array.
-        ll=l+1 -- save just after where we found it for searching next time.
-      else
-        table.insert(t, string.sub(p,ll)) -- Save what's left in our array.
-        break -- Break at end, as it should be, according to the lua manual.
-      end
-    end
-  return t
+local function szetvalaszt(mit,mibe)
+	local hol = mibe:find(mit)
+	return {mibe:sub(0,hol-1),mibe:sub(hol+1)}
 end
 
 
@@ -82,7 +69,7 @@ function client:update(dt)
 	if event then
 		if event.type == "receive" then
 			--kiir:new("Got message: "..event.data.." "..event.peer:connect_id())
-			local t = explode("?",event.data)
+			local t = szetvalaszt("?",event.data)
 			if t[1]=="ciet3h4jo" then player.id=tonumber(t[2])
 			elseif t[1]=="fruej3f4t" then -- szervertől kapott új blokkok | ha nem kapja meg bugolni fog :/
 
@@ -121,7 +108,7 @@ function client:draw()
 	kamera:aPos(player.x,player.y) --kamera beállítása: player közepe - képernyő méret fele * nagyitás
 	kamera:set()
 
-	env:draw()
+	--env:draw()
 		
 		for o,obj in pairs(client.objs) do
 			love.graphics.setColor(obj.DATA.szin.rr,obj.DATA.szin.gg,obj.DATA.szin.bb,math.floor(obj.time/2))
@@ -150,7 +137,7 @@ function client:draw()
 				local b = true
 				for a,s in ipairs(ignore) do
 					if s==k then b = false end 
-				end  
+				end
 				if b then text = text..k..": "..type(v).."\n" end
 			end
 		end
