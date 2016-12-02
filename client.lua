@@ -12,6 +12,23 @@ local function szetvalaszt(mit,mibe)
 	return {mibe:sub(0,hol-1),mibe:sub(hol+1)}
 end
 
+local function getElmozdulas(regipontok,ujpontok) -- elmozdulást számolja
+	local elmozd = {}
+	for i,rp in ipairs(regipontok) do
+		table.insert(elmozd,ujpontok[i]-rp)
+	end
+	return elmozd
+end
+
+local function setElmozdulas(pontok,elmozd) -- elmozdulást számolja
+	if elmozd==nil then return pontok end
+	local ujpontok = {}
+	for i,p in ipairs(pontok) do
+		table.insert(ujpontok,p+elmozd[i]/2)
+	end
+	return ujpontok
+end
+
 
 function client:init()
 	--Cliens beállításai
@@ -75,7 +92,8 @@ function client:update(dt)
 
 				local objs = loadstring(t[2])() --objs = objektumok
 				for o,obj in ipairs(objs) do
-					client.objs[obj[2].ID] = {points=obj[1],DATA=obj[2],teamcolor=obj[3],time=255} -- obj[1]=pontok | obj[2]=DATA | obj[3]=csapat szin
+					client.objs[obj[2].ID] = {points=obj[1],DATA=obj[2],teamcolor=obj[3],time=255,elmozdulas=nil} -- obj[1]=pontok | obj[2]=DATA | obj[3]=csapat szin
+					--print(obj[2].ID)
 				end
 
 			elseif t[1]=="akh8734tg" then -- a szervertől kapott elmozdulások.
@@ -83,7 +101,8 @@ function client:update(dt)
 				local objs = loadstring(t[2])()
 				for o,obj in ipairs(objs) do
 					--local points,ID,time = obj[1], obj[2], obj[3]
-					client.objs[obj[2]].points = obj[1] -- pozíciót adja át
+					client.objs[obj[2]].elmozdulas = getElmozdulas(client.objs[obj[2]].points,obj[1])
+					--eseményen kívül számolunk client.objs[obj[2]].points = obj[1] -- pozíciót adja át
 					client.objs[obj[2]].time = obj[3] -- a látszódási időt / átlátszóságot adja át
 					if obj[3]==0 then client.objs[obj[2]]=nil end -- lejárt idejűek törlése
 				end
@@ -105,12 +124,13 @@ function client:update(dt)
 end
 
 function client:draw()
-	kamera:aPos(player.x,player.y) --kamera beállítása: player közepe - képernyő méret fele * nagyitás
+	kamera:aPos(player.x,player.y) --kamera beállítása
 	kamera:set()
 
 	--env:draw()
 		
 		for o,obj in pairs(client.objs) do
+			obj.points = setElmozdulas(obj.points,obj.elmozdulas)
 			love.graphics.setColor(obj.DATA.szin.rr,obj.DATA.szin.gg,obj.DATA.szin.bb,math.floor(obj.time/2))
 			love.graphics.polygon("fill",obj.points)
 			love.graphics.setColor(obj.teamcolor.rr,obj.teamcolor.gg,obj.teamcolor.bb,obj.time)
@@ -127,10 +147,7 @@ function client:draw()
 
 	if DEBUG then
 		love.graphics.print(player.x.."       "..player.y.."\n"..mx.."      "..my.."\n"..player.kijelol.." kijelolve",10,10)
-		local text = ""
-		--[[for k,v in pairs(_G) do
-			if type(v)~="function" then text = text..k..": "..type(v).."\n" end
-		end]]
+		local text = "" --Kiírja a globális változókat és típúsaikat (az alapértelmezetekket leszámítva)
 		local ignore = {"coroutine","io","arg","love","jit","bit","package","debug","table","_VERSION","math","text","os","_G","string"}
 		for k,v in pairs(_G) do
 			if type(v)~="function" then 
