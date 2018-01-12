@@ -5,13 +5,13 @@ player.x=0
 player.y=0
 player.r=0
 player.s=1
-player.speed=100
+player.speed=1000
 
 function player.update(dt)
 	for k,key in ipairs(cfg.keys.up) do
 		if love.keyboard.isDown(key) then
 			player.y=player.y-player.speed*dt
-			--break -- Hogy ne tudjon dupla sebességgel menni
+			break -- Hogy ne tudjon dupla sebességgel menni
 		end 
 	end
 	for k,key in ipairs(cfg.keys.down) do
@@ -41,10 +41,11 @@ function player.keypressed(key)
 			break
 		end 
 	end
+	kiir.add("+"..key,3,{200,200,0})
 end
 
 function player.keyreleased(key)
-
+	kiir.add("-"..key,3,{200,200,0})
 end
 
 return player

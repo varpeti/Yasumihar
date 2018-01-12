@@ -1,8 +1,12 @@
-local kamera = require('lib/kamera')
-cfg = require('cfg/cfgloader')
-local player = require('game/player') --cfg kell neki
+cfg          = require('cfg/cfgloader')
+hud          = require('lib/hud') kiir = hud.new_szoveg_doboz(10,10) table.insert(hud.wids,kiir)
 
-DEBUG = true
+local kamera = require('lib/kamera')
+local ser    = require('lib/ser')
+
+local player = require('game/player') 
+local server = require('game/server')
+local client = require('game/client')
 
 function love.load()
     love.window.setMode(cfg.cvar.XX,cfg.cvar.YY,{
@@ -18,10 +22,14 @@ function love.load()
         minheight=cfg.cvar.minheight,
         highdpi=cfg.cvar.highdpi
     })
+    love.window.setTitle("Yasumihar - Váraljai Péter")
+    kiir.add("main",3)
 end
 
 function love.update(dt)
     player.update(dt)
+    if cfg.cvar.server then server.update(dt) end
+    if cfg.cvar.client then client.update(dt) end
 end
 
 function love.keypressed(key)
@@ -37,9 +45,9 @@ function love.draw()
     kamera:aRot(player.r)
     kamera:aScale(player.s,player.s)
     kamera:set()
-        --Background
-        --Front
-        love.graphics.print("A",0,0)
+        -- World
+        if cfg.cvar.client then client.draw() end
     kamera:unset()
-        --HUD
+        -- HUD
+        if cfg.cvar.client then client.HUD()  end
 end
