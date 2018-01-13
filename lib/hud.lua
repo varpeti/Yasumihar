@@ -3,6 +3,7 @@ hud.wids = {}
 hud.font = love.graphics.newFont(12) love.graphics.setFont(hud.font)
 
 function hud.draw()
+	love.graphics.setColor(255,255,255,255)
 	for id,wid in ipairs(hud.wids) do
 		wid.draw(0,0)
 	end

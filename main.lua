@@ -1,8 +1,7 @@
 cfg          = require('cfg/cfgloader')
 hud          = require('lib/hud') kiir = hud.new_szoveg_doboz(10,10) table.insert(hud.wids,kiir)
-
-local kamera = require('lib/kamera')
-local ser    = require('lib/ser')
+kamera       = require('lib/kamera')
+--local ser    = require('lib/ser')
 
 local player = require('game/player') 
 local server = require('game/server')
