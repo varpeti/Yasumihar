@@ -23,10 +23,4 @@ function com.newObj(points,color,type,img,usd)
     env:newObj(points,color,color2,img,usd)
 end
 
-function com.mousepressed(x,y,button,istouch)
-    if key==1 then
-        return env:click(x,y)
-    end
-end
-
 return com

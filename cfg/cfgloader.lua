@@ -15,11 +15,15 @@ local function load(file)
     return cnt.."return "..file
 end
 
-local function call()
-    cfg.keys = loadstring(load('keys'))()
-    cfg.cvar = loadstring(load('cvar'))()
+function ppcall(fv,error)
+    local out
+    if not pcall(function() gout = loadstring(load(fv))() end) then error(error) end
+    out = gout
+    gout=nil
+    return out
 end
 
-if not pcall(call) then error("Attempt to load a bad cfg file.") end
+cfg.keys = ppcall('keys',"Failed to load the keys cfg file.")
+cfg.cvar = ppcall('cvar',"Failed to load the cvar cfg file.")
 
 return cfg

@@ -1,7 +1,6 @@
 cfg          = require('cfg/cfgloader')
 hud          = require('lib/hud') kiir = hud.new_szoveg_doboz(10,10) table.insert(hud.wids,kiir)
-kamera       = require('lib/kamera')
---local ser    = require('lib/ser')
+local kamera = require('lib/kamera')
 
 local player = require('game/player') 
 local server = require('game/server')
@@ -37,6 +36,18 @@ end
 
 function love.keyreleased(key)
     player.keyreleased(key)
+end
+
+function love.mousepressed(x, y, button, istouch)
+    player.mousepressed(x, y, button, istouch)
+end
+
+function love.mousereleased(x, y, button, istouch)
+    player.mousereleased(x, y, button, istouch)
+end
+
+function love.wheelmoved(x, y)
+    player.wheelmoved(y)
 end
 
 function love.draw()

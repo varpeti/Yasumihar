@@ -41,11 +41,27 @@ function player.keypressed(key)
 			break
 		end 
 	end
-	kiir.add("+"..key,3,{200,200,0})
+	if cfg.cvar.debug3 then kiir.add("+"..key,3,{200,200,0}) end
 end
 
 function player.keyreleased(key)
-	kiir.add("-"..key,3,{200,200,0})
+	if cfg.cvar.debug3 then kiir.add("-"..key,3,{200,200,0}) end
+end
+
+function player.mousepressed(x, y, button, istouch)
+    if cfg.cvar.debug3 then kiir.add("+mouse"..button,3,{200,200,0}) end
+end
+
+function player.mousereleased(x, y, button, istouch)
+    if cfg.cvar.debug3 then kiir.add("-mouse"..button,3,{200,200,0}) end
+end
+
+function player.wheelmoved(y)
+	if cfg.cvar.debug3 then  
+    	if y>0 then kiir.add("mouseWheelUp",  3,{200,200,0})
+    	else        kiir.add("mouseWheelDown",3,{200,200,0})
+    	end
+    end
 end
 
 return player
